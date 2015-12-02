@@ -1,0 +1,1168 @@
+/*
+ * Copyright (c) 2006, Gregory Neverov
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+ * 3. Neither the name of the author nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ */
+
+header
+{
+	using System.Collections.Generic;
+	using System.Globalization;
+	using System.Text;
+	using Metaphor.Collections;
+}
+options
+{
+	language = "CSharp";
+	namespace = "Metaphor.Compiler";
+}
+
+class P extends Parser;
+options
+{
+	k = 1;
+}
+{
+	void NotDone(IToken token, string msg)
+	{
+		throw new SemanticException(msg, token.getFilename(), token.getLine(), token.getColumn());
+	}
+	
+	T ListReverse<T>(T list) where T : class, System.Collections.IList
+	{
+		if(list != null)
+		{
+			int n2 = list.Count / 2;
+			int n1 = list.Count - 1;
+			for(int i = 0; i < n2; i++)
+			{
+				object tmp = list[i];
+				list[i] = list[n1 - i];
+				list[n1 - i] = tmp;
+			}
+			return list;
+		}
+		else return null;
+	}
+}
+
+//C.2 Syntactic grammar
+literal returns [Literal result] { result = null; }: 
+	f:FALSE { result = new LitBool(f, false); }
+|
+	t:TRUE { result = new LitBool(t, true); }
+|
+	int32:INT32_DECIMAL_INTEGER_LITERAL { result = new LitInt(int32, int.Parse(int32.getText())); }
+|
+	int64:INT64_DECIMAL_INTEGER_LITERAL { result = new LitLong(int64, long.Parse(int64.getText())); }
+|
+	uInt32:UINT32_DECIMAL_INTEGER_LITERAL { NotDone(uInt32, "unsigned integer literals"); }
+|
+	uInt64:UINT64_DECIMAL_INTEGER_LITERAL { NotDone(uInt64, "unsigned integer literals"); }
+|
+	int32h:INT32_HEXADECIMAL_INTEGER_LITERAL { result = new LitInt(int32h, int.Parse(int32h.getText(), NumberStyles.AllowHexSpecifier)); }
+|
+	int64h:INT64_HEXADECIMAL_INTEGER_LITERAL { result = new LitLong(int64h, long.Parse(int64h.getText(), NumberStyles.AllowHexSpecifier)); }
+|
+	uInt32h:UINT32_HEXADECIMAL_INTEGER_LITERAL { NotDone(uInt32h, "unsigned integer literals"); }
+|
+	uInt64h:UINT64_HEXADECIMAL_INTEGER_LITERAL { NotDone(uInt64h, "unsigned integer literals"); }
+|
+	float32:FLOAT32_REAL_LITERAL { result = new LitFloat(float32, float.Parse(float32.getText())); }
+|
+	float64:FLOAT64_REAL_LITERAL { result = new LitDouble(float64, double.Parse(float64.getText())); }
+|
+	dec:DECIMAL_REAL_LITERAL { result = new LitDecimal(dec, decimal.Parse(dec.getText())); }
+|
+	chr:CHARACTER_LITERAL { result = new LitChar(chr, chr.getText()[0]); }
+|
+	str:STRING_LITERAL { result = new LitString(str, str.getText()); }
+|
+	n:NULL { result = new LitNull(n); }
+;
+
+identifier returns [Ident result] { result = null; }: i : IDENTIFIER { result = new Ident(i, i.getText()); };
+
+//C.2.1 Basic concepts
+namespace_name returns [Ident result] { result = null; StringBuilder sb = null; }: 
+	i : IDENTIFIER { sb = new StringBuilder(i.getText()); }
+	(
+		DOT j : IDENTIFIER { sb.Append("."); sb.Append(j.getText()); }
+	)* { result = new Ident(i, sb.ToString()); }
+;
+
+type_name returns [ClassType result] { result = null; Ident name = null; List<Typ> typeArgs = null; }:
+	name = identifier (typeArgs = type_argument_list)? { result = new ClassType(null, name, typeArgs); typeArgs = null; }
+	(
+		DOT name = identifier (typeArgs = type_argument_list)? { result = new ClassType(result, name, typeArgs);  typeArgs = null; }
+	)*
+;
+
+//C.2.2 Types
+type returns [Typ result] { result = null; List<int> ranks = null; }: 
+	result = non_array_type 
+	(
+		ranks = rank_specifiers { result = ArrayType.Create(result, ranks); }
+	)?
+;
+
+non_array_type returns [Typ result] { result = null; }:
+	result = type_name 
+|
+	result = predefined_type
+;
+
+predefined_type returns [PrimType result] { result = null; }:
+	t1 : BOOL { result = PrimType.CreateBool(t1); }
+|
+	t2 : DECIMAL { result = PrimType.CreateDecimal(t2); }
+|
+	t3 : SBYTE { NotDone(t3, "signed byte type"); }
+|
+	t4 : BYTE { result = PrimType.CreateByte(t4); }
+|
+	t5 : SHORT { result = PrimType.CreateShort(t5); }
+|
+	t6 : USHORT { NotDone(t6, "unsigned short type"); }
+|
+	t7 : INT { result = PrimType.CreateInt(t7); }
+|
+	t8 : UINT { NotDone(t8, "unsigned int type"); }
+|
+	t9 : LONG { result = PrimType.CreateLong(t9); }
+|
+	t10 : ULONG { NotDone(t10, "unsigned long type"); }
+|
+	t11 : CHAR { result = PrimType.CreateChar(t11); }
+|
+	t12 : FLOAT { result = PrimType.CreateFloat(t12); }
+|
+	t13 : DOUBLE { result = PrimType.CreateDouble(t13); }
+|
+	t14 : OBJECT { result = PrimType.CreateObject(t14); }
+|
+	t15 : STRING { result = PrimType.CreateString(t15); }
+|
+	t16 : VOID { result = PrimType.CreateVoid(t16); }	
+;
+
+rank_specifiers returns [List<int> result] { result = null; int dims = 0; }:
+	{ result = new List<int>(); }
+	(
+		{ dims = 1; }
+		LBRACK 
+			(COMMA { dims++; })* 
+		RBRACK { result.Add(dims); }
+	)+
+;
+
+type_argument_list returns [List<Typ> result] { result = null; Typ typ = null; }:
+	LANGLE 
+	typ = type 
+	{
+		result = new List<Typ>(); 
+		result.Add(typ); 
+	}
+	(
+		COMMA typ = type { result.Add(typ); }
+	)* 
+	RANGLE
+;
+
+//C.2.4 Expressions
+argument_list returns [List<Arg> result] { result = null; Arg arg = null; }: 
+	arg = argument 
+	{ 
+		result = new List<Arg>(); 
+		result.Add(arg); 
+	}
+	(
+		COMMA arg = argument { result.Add(arg); }
+	)*
+;
+
+argument returns [Arg result] { result = null; Expr expr = null; }: 
+	expr = expression { result = new Arg(Dir.In, expr); }
+|
+	REF expr = primary_expression { result = new Arg(Dir.InOut, expr); }
+|
+	OUT expr = primary_expression { result = new Arg(Dir.Out, expr); }
+;
+
+expression_list returns [List<Expr> result] { result = null; Expr expr = null; }: 
+	expr = expression 
+	{ 
+		result = new List<Expr>(); 
+		result.Add(expr); 
+	}
+	(
+		COMMA expr = expression { result.Add(expr); }
+	)*
+;
+
+primary_expression returns [Expr result] { result = null; Typ typ = null; List<Expr> exprs = null; List<int> ranks = null; int dims = 0; Ident name = null; List<Typ> typeArgs = null; List<Arg> args = null; }: 
+	(NEW non_array_type LBRACK) => t1 : NEW typ = non_array_type LBRACK
+	(
+		{ ranks = new List<int>(); }
+		exprs = expression_list { ranks.Add(exprs.Count); }
+		RBRACK
+		(
+			{ dims = 1; }
+			LBRACK 
+				(COMMA { dims++; })* 
+			RBRACK { ranks.Add(dims); }
+		)* { result = new ArrayCreation(t1, ArrayType.Create(typ, ranks), exprs); }
+	|
+		{ dims = 1; }
+		(COMMA { dims++; })* 
+		RBRACK exprs = array_initializer { result = new ArrayCreation(t1, new ArrayType(typ, dims), new ArrayInitialisation(exprs)); }
+	)
+|
+	result = primary_expression_start 
+	(
+		DOT name = identifier typeArgs = type_argument_list_opt { result = new MemberAccess(result, name, typeArgs); }
+	|
+		{ args = null; } LPAREN (args = argument_list)? RPAREN { result = new Invocation(result, args); }
+	|
+		LBRACK exprs = expression_list RBRACK { result = new ElementAccess(result, exprs); }
+	|
+		INC { result = new PostIncrement(result); }
+	|
+		DEC { result = new PostDecrement(result); }
+	)*
+;
+
+primary_expression_start returns [Expr result] { result = null; List<Typ> typeArgs = null; Typ typ = null; Ident name = null; List<Arg> args = null; List<Expr> exprs = null; List<Param> pars = null; List<Stmt> stmts = null; }: 
+	result=literal
+|
+	name = identifier typeArgs = type_argument_list_opt { result = new Name(name, typeArgs); }
+|	
+	t1 : LPAREN result = expression RPAREN { result = new Parentheses(t1, result); }
+|
+	typ = predefined_type DOT name = identifier typeArgs = type_argument_list_opt { result = new MemberAccess(typ, name, typeArgs); }
+|
+	t2 : THIS { result = new This(t2); } 
+|
+	t3 : BASE DOT 
+	(
+		name = identifier typeArgs = type_argument_list_opt { result = new BaseMember(t3, name, typeArgs); }
+	|
+		LBRACK exprs = expression_list RBRACK { result = new BaseIndexer(t3, exprs); }
+	)
+|	
+	t4 : NEW typ = non_array_type LPAREN (args = argument_list)? RPAREN { result = new ObjectCreation(t4, typ, args); }
+|
+	t5 : TYPEOF LPAREN typ = type RPAREN { result = new TypeOf(t5, typ); }
+|
+	t6 : DEFAULT LPAREN typ = type RPAREN { result = new DefaultOf(t6, typ); }
+|
+	t7 : DELEGATE (name = identifier)? (LPAREN (pars = formal_parameter_list)? RPAREN)? stmts = block { result = new Function(t7, name, pars, stmts); }
+|
+	t8 : LMETA stmts = quoted_statement [ref result] RMETA { result = new Bracket(t8, ListReverse(stmts), result); }
+//|
+//	t9 : (LMETA CLASS) => LMETA (type_declaration)+ RMETA { result = new Module(t9, ListReverse(stmts), result); } 
+;
+
+protected
+type_argument_list_opt returns [List<Typ> result] { result = null; }:
+		(type_argument_list (LPAREN | RPAREN | RBRACK | RANGLE | COLON | SEMI | COMMA | DOT | QUESTION)) => result = type_argument_list
+|
+;
+
+unary_expression returns [Expr result] { result = null; List<Stmt> stmts = null; Ident name = null; Typ typ = null; }: 
+	t1: PLUS result = unary_expression { result = new Plus(t1, result); }
+|
+	t2: MINUS result = unary_expression { result = new Negate(t2, result); }
+|
+	t3: LNOT result = unary_expression { result = new Not(t3, result); }
+|
+	t4 : NOT result = unary_expression { result = new Complement(t4, result); }
+|
+	t5 : INC result = unary_expression{ result = new PreIncrement(t5, result); }
+|
+	t6 : DEC result = unary_expression{ result = new PreDecrement(t6, result); }
+|
+	t7 : ESCAPE 
+	(
+		result = unary_expression { result = new EscapeExpr(t7, result); }
+//	|
+//		stmts = block { result = new Escape(t7, stmts, null); }
+//		/*(
+//			name = identifier { result = new Escape(t7, stmts, new Name(name, null)); }
+//		|
+//			LPAREN result = expression RPAREN { result = new Escape(t7, stmts, result); }
+//		| { result = new Escape(t7, stmts, null); }
+//		)*/
+	)
+|
+	(LPAREN type RPAREN) => 
+	(
+		(LPAREN expression RPAREN (AS | IS | LBRACE | RBRACE | LBRACK | RBRACK | RPAREN | DOT | COMMA | COLON | SEMI | PLUS | MINUS | TIMES | QUOT | REM | AND | OR | XOR | ASSIGN | LANGLE | RANGLE | COND | INC | DEC | LAND | LOR | SHL | EQ | NE | LE | GE | PLUS_ASSIGN | MINUS_ASSIGN | TIMES_ASSIGN | QUOT_ASSIGN | REM_ASSIGN | AND_ASSIGN | OR_ASSIGN | XOR_ASSIGN | SHL_ASSIGN | SHR_ASSIGN | ARROW | RMETA | SEMI_ASSIGN)) => result = primary_expression
+	|
+		t8 : LPAREN typ = type RPAREN result = unary_expression { result = new Cast(t8, typ, result); }
+	)
+|
+	result = primary_expression
+;
+
+multiplicative_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = unary_expression 
+	(
+		TIMES expr = unary_expression { result = new Multiply(result, expr); }
+	|
+		QUOT expr = unary_expression { result = new Divide(result, expr); }
+	|
+		REM expr = unary_expression { result = new Remainder(result, expr); }
+	)*
+;
+
+additive_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = multiplicative_expression 
+	(
+		PLUS expr = multiplicative_expression { result = new Add(result, expr); }
+	|
+		MINUS expr = multiplicative_expression { result = new Subtract(result, expr); }
+	)*
+;
+
+shift_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = additive_expression 
+	(
+		SHL expr = additive_expression { result = new ShiftLeft(result, expr); }
+	|
+		SHR expr = additive_expression { result = new ShiftRight(result, expr); }
+	)*
+;
+
+relational_expression returns [Expr result] { result = null; Expr expr = null; Typ typ = null; }: 
+	result = shift_expression
+	(
+		LANGLE expr = shift_expression { result = new LessThan(result, expr); }
+	|
+		RANGLE expr = shift_expression { result = new GreaterThan(result, expr); }
+	|
+		LE expr = shift_expression { result = new LessEqual(result, expr); }
+	|
+		GE expr = shift_expression { result = new GreaterEqual(result, expr); }
+	|
+		IS typ = type_in_expression { result = new Is(result, typ); }
+	|
+		AS typ = type_in_expression { result = new As(result, typ); }
+	)*
+;
+
+protected
+type_name_in_expression returns [ClassType result] { result = null; Ident name = null; List<Typ> typeArgs = null; }:
+	name = identifier typeArgs = type_argument_list_opt { result = new ClassType(null, name, typeArgs); }
+	(
+		DOT name = identifier typeArgs = type_argument_list_opt { result = new ClassType(result, name, typeArgs); }
+	)*
+;
+
+protected
+type_in_expression returns [Typ result] { result = null; List<int> ranks = null; }:
+	(
+		result = type_name_in_expression
+	|
+		result = predefined_type
+	) 
+	(
+		ranks = rank_specifiers { result = ArrayType.Create(result, ranks); }
+	)?
+;
+
+equality_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = relational_expression 
+	(
+		EQ expr = relational_expression { result = new Equals(result, expr); }
+	|
+		NE expr = relational_expression { result = new NotEqual(result, expr); }
+	)*
+;
+
+and_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = equality_expression 
+	(
+		AND expr = equality_expression { result = new And(result, expr); }
+	)*
+;
+
+exclusive_or_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = and_expression 
+	(
+		XOR expr = and_expression { result = new Xor(result, expr); }
+	)*
+;
+
+inclusive_or_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = exclusive_or_expression 
+	(
+		OR expr = exclusive_or_expression { result = new Or(result, expr); }
+	)*
+;
+
+conditional_and_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = inclusive_or_expression 
+	(
+		LAND expr = inclusive_or_expression { result = new LogicalAnd(result, expr); }
+	)*
+;
+
+conditional_or_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = conditional_and_expression 
+	(
+		LOR expr = conditional_and_expression { result = new LogicalOr(result, expr); }
+	)*
+;
+
+conditional_expression returns [Expr result] { result = null; Expr expr1 = null; Expr expr2 = null; }: 
+	result = conditional_or_expression 
+	(
+		QUESTION expr1 = conditional_expression COLON expr2 = conditional_expression { result = new Conditional(result, expr1, expr2); }
+	)?
+;
+
+assignment_expression returns [Expr result] { result = null; Expr expr = null; }: 
+	result = conditional_expression
+	(
+		ASSIGN expr = conditional_expression { result = new Assign(result, expr); }
+	|
+		PLUS_ASSIGN expr = conditional_expression { result = new AddAssign(result, expr); }
+	| 
+		MINUS_ASSIGN expr = conditional_expression { result = new SubtractAssign(result, expr); }
+	|
+		TIMES_ASSIGN expr = conditional_expression { result = new MultiplyAssign(result, expr); }
+	| 
+		QUOT_ASSIGN expr = conditional_expression { result = new DivideAssign(result, expr); }
+	|
+		REM_ASSIGN expr = conditional_expression { result = new RemainderAssign(result, expr); }
+	|
+		AND_ASSIGN expr = conditional_expression { result = new AndAssign(result, expr); }
+	|
+		XOR_ASSIGN expr = conditional_expression { result = new XorAssign(result, expr); }
+	| 
+		OR_ASSIGN expr = conditional_expression { result = new OrAssign(result, expr); }
+	|
+		SHL_ASSIGN expr = conditional_expression { result = new ShiftLeftAssign(result, expr); }
+	| 
+		SHR_ASSIGN expr = conditional_expression { result = new ShiftRightAssign(result, expr); }
+	| 
+		SEMI_ASSIGN expr = conditional_expression { result = new SemiAssign(result, expr); }
+	)*
+;
+
+expression returns [Expr result] { result = null; }: 
+	t : LIFT result = assignment_expression { result = new Lift(t, result); }
+|
+	result = assignment_expression
+;
+
+//C.2.5 Statements
+block returns [List<Stmt> result] { result = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Stmt stmt = null; }: 
+	{ result = new List<Stmt>(); }
+	LBRACE 
+	(
+		(IDENTIFIER COLON) => name = identifier COLON { result.Add(new Label(name)); }
+	|
+		(type IDENTIFIER) => typ = type vars = variable_declarators SEMI { LocalDecl.Add(result, typ, vars); }
+	|
+		t1 : CONST typ = type vars = variable_declarators SEMI { ConstDecl.Add(result, t1, typ, vars); }
+	|
+		stmt = embedded_statement { result.Add(stmt); }
+	)* 
+	RBRACE
+;
+
+embedded_statement returns [Stmt result] { result = null; List<Stmt> stmts = null; Expr expr = null; }:
+	stmts = block { result = new Block(stmts); }
+|
+	result = actual_statement
+|
+	(ESCAPE LBRACE) => t : ESCAPE stmts = block { result = new EscapeStmt(t, stmts); }
+|
+	expr = expression SEMI { result = new Expression(expr); }
+;
+
+quoted_statement [ref Expr expr] returns [List<Stmt> result] { result = new List<Stmt>(); List<Stmt> stmts = null; Stmt stmt = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; }:
+|
+	(IDENTIFIER COLON) => name = identifier COLON result = quoted_statement [ref expr] { result.Add(new Label(name)); }
+|
+	(type IDENTIFIER) => typ = type vars = variable_declarators SEMI result = quoted_statement [ref expr] { LocalDecl.Add(result, typ, vars); }
+|
+	t1 : CONST typ = type vars = variable_declarators SEMI result = quoted_statement [ref expr] { ConstDecl.Add(result, t1, typ, vars); }
+|
+	stmts = block result = quoted_statement [ref expr] { result.Add(new Block(stmts)); }
+|
+	stmt = actual_statement result = quoted_statement [ref expr] { result.Add(stmt); }
+|
+	expr = expression (SEMI { stmt = new Expression(expr); expr = null; } result = quoted_statement [ref expr] { result.Add(stmt); })?
+
+/*
+	(
+		(IDENTIFIER COLON) => name = identifier COLON { result.Add(new Label(name)); }
+	|
+		(type IDENTIFIER) => typ = type vars = variable_declarators SEMI { LocalDecl.Add(result, typ, vars); }
+	|
+		t1 : CONST typ = type vars = variable_declarators SEMI { ConstDecl.Add(result, t1, typ, vars); }
+	|
+		stmts = block { result.Add(new Block(stmts)); }
+	|
+		stmt = actual_statement { result.Add(stmt); }
+	|
+		expr = expression SEMI { result.Add(new Expression(expr)); }
+	)*
+*/
+/*
+	result = block (expr = expression)?
+|
+	stmt = actual_statement 
+	{ 
+		result = new List<Stmt>(); 
+		result.Add(stmt);
+	}
+|
+	expr = expression 
+	(
+		SEMI
+		{
+			result = new List<Stmt>(); 
+			result.Add(new Expression(expr));
+			expr = null;
+		}
+	)?
+|
+	{ 
+		result = new List<Stmt>(); 
+		result.Add(new Empty());
+	}
+*/
+;
+
+actual_statement returns [Stmt result] { result = null; Expr expr = null; Stmt stmt = null; Stmt stmt2 = null; List<Case> cases = null; Either<LocalDecl, List<Expr>> forInit = new Either<LocalDecl, List<Expr>>(); List<Expr> exprs = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; List<Catch> catches = null; Finally fin = null; List<Tuple<Ident,int>> typeParamNames = null; List<TypeParam> typeParamCons = null; bool isStatic = false; Ident retType = null; List<Tuple<string,bool>> pars = null; Ident paramName = null; bool paramRef = false; }:
+	SEMI { result  = new Empty(); }
+|
+	t1 : IF LPAREN expr = expression RPAREN stmt = embedded_statement (options {warnWhenFollowAmbig = false;}: ELSE stmt2 = embedded_statement)? { result = new If(t1, expr, stmt, stmt2); }
+|
+	t2: SWITCH LPAREN expr = expression RPAREN LBRACE cases = switch_sections RBRACE { result = new Switch(t2, expr, cases); }
+|
+	t3 : WHILE LPAREN expr = expression RPAREN stmt = embedded_statement { result = new While(t3, expr, stmt); }
+|
+	t4 : DO stmt = embedded_statement WHILE LPAREN expr = expression RPAREN SEMI { result = new Do(t4, stmt, expr); }
+|
+	t5 : FOR LPAREN (forInit = for_initializer)? SEMI (expr = expression)? SEMI (exprs = expression_list)? RPAREN stmt = embedded_statement
+	{
+		if(forInit.IsLeft)
+			result = new For(t5, forInit.Left, expr, exprs, stmt);
+		else
+			result = new For(t5, forInit.Right, expr, exprs, stmt);
+	}
+|
+	t6 : FOREACH LPAREN typ = type name = identifier IN expr = expression RPAREN stmt = embedded_statement { result = new Foreach(t6, typ, name, expr, stmt); }
+|
+	t7 : BREAK SEMI { result = new Break(t7); }
+|
+	t8 : CONTINUE SEMI { result = new Continue(t8); }
+|
+	t9 : GOTO name = identifier SEMI { result = new Goto(t9, name); }
+|
+	t10 : RETURN (expr = expression)? SEMI { result = new Return(t10, expr); }
+|
+	t11 : THROW (expr = expression)? SEMI { result = new Throw(t11, expr); }
+|
+	t12 : TRY stmts = block (catches = catch_clauses (fin = finally_clause)? | fin = finally_clause) { result = new Try(t12, stmts, catches, fin); }
+|
+	t13 : CHECKED stmts = block { NotDone(t13, "checked blocks"); }
+|
+	t14 : UNCHECKED stmts = block { NotDone(t14, "unchecked blocks"); }
+|
+	t15 : LOCK LPAREN expr = expression RPAREN stmt = embedded_statement { NotDone(t15, "lock blocks"); }
+|
+	t16 : USING LPAREN typ = type name = identifier ASSIGN expr = expression RPAREN stmt = embedded_statement { NotDone(t16, "using blocks"); }
+|
+	t17 : TYPEIF (typeParamNames = type_parameter_list)? LPAREN
+	name = identifier IS typ = type typeParamCons = type_parameter_constraints_clauses
+	RPAREN 
+	stmt = embedded_statement 
+	(options {warnWhenFollowAmbig = false;}: ELSE stmt2 = embedded_statement)? 
+		{ result = new TypeIf(t17, typeParamNames, name, typ, typeParamCons, stmt, stmt2); }
+|
+	t18 : WITHTYPE LPAREN name = identifier 
+	AS expr = expression RPAREN 
+	stmt = embedded_statement { result = new WithType(t18, name, expr, stmt); }
+|
+	t19 : FORMEMBER	
+	LPAREN 
+	(STATIC { isStatic = true; })?
+	retType = identifier 
+	name = identifier 
+	(LPAREN pars = formal_argument_pattern_list	RPAREN)? 
+	IN typ = type RPAREN stmt = embedded_statement 
+		{ result = new ForMember(t19, isStatic, retType.Name, name, pars, typ, stmt); }
+;
+
+protected
+formal_argument_pattern_list returns [List<Tuple<string, bool>> result] { result = new List<Tuple<string, bool>>(); Tuple<string, bool> pat = new Tuple<string, bool>(); }:
+	(
+		pat = formal_argument_pattern { result.Add(pat); }
+		(COMMA pat = formal_argument_pattern { result.Add(pat); })*
+	)?
+;
+
+protected
+formal_argument_pattern returns [Tuple<string, bool> result] { result = new Tuple<string, bool>(); Ident name = null; }:
+	(REF { result.snd = true; })?
+	name = identifier { result.fst = name.Name; }
+;
+	
+//constant_declarator: IDENTIFIER ASSIGN literal;
+
+//constant_declarators: constant_declarator (COMMA constant_declarator)*;
+
+variable_declarator returns [Tuple<Ident, Expr> result] { result = new Tuple<Ident, Expr>(); Ident name = null; Expr init = null; }:
+	name = identifier (ASSIGN init = variable_initializer)? { result = new Tuple<Ident, Expr>(name, init); }
+;
+
+variable_declarators returns [List<Tuple<Ident, Expr>> result] { result = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); }: 
+	{ result = new List<Tuple<Ident, Expr>>(); }
+	var = variable_declarator { result.Add(var); }
+	(
+		COMMA var = variable_declarator { result.Add(var); }
+	)*
+;
+
+switch_sections returns [List<Case> result] { result = null; Literal lit = null; List<Literal> lits = null; List<Stmt> stmts = null; IToken t = null; }: 
+	{ result = new List<Case>(); }
+	(
+		{ lits = new List<Literal>(); }
+		(
+			t1 : CASE lit = literal { lits.Add(lit); if(t == null) t = t1; }
+		)+ 
+		stmts = block { result.Add(new Case(t, lits, stmts)); }
+	|
+		t2 : DEFAULT stmts = block { result.Add(new Case(t2, null, stmts)); }
+	)*
+;
+
+for_initializer returns [Either<LocalDecl, List<Expr>> result] { result = new Either<LocalDecl, List<Expr>>(); Typ typ = null; Ident name = null; Expr var = null; }: 
+	(type IDENTIFIER) => typ = type name = identifier ASSIGN var = variable_initializer { result = new LocalDecl(typ, name, var); }
+|
+	result = expression_list
+;
+
+catch_clauses returns [List<Catch> result] { result = null; Catch c = null; }: 
+	{ result = new List<Catch>(); }
+	(
+		c = catch_clause { result.Add(c); }
+	)+
+;
+
+catch_clause returns [Catch result] { result = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; }: 
+	t : CATCH
+	(
+		LPAREN typ = type (name = identifier)? RPAREN stmts = block { result = new Catch(t, typ, name, stmts); }
+	|
+		stmts = block { result = new Catch(t, null, null, stmts); }
+	)
+;
+
+finally_clause returns [Finally result] { result = null; List<Stmt> stmts = null; }: 
+	t : FINALLY stmts = block { result = new Finally(t, stmts); }
+;
+
+//C.2.6 Namespaces
+compilation_unit returns [Module result] { result = null; List<Ident> usings = null; Tuple<List<Namespace>, List<TypeDecl>> body = new Tuple<List<Namespace>, List<TypeDecl>>(); }: 
+	usings = using_directives
+	body = namespace_body
+	EOF { result = new Module(usings, new Namespace(null, null, body.fst, body.snd)); }
+;
+
+namespace_declaration returns [Namespace result] { result = null; Ident name = null; Tuple<List<Namespace>, List<TypeDecl>> body = new Tuple<List<Namespace>, List<TypeDecl>>(); }: 
+	t : NAMESPACE name = namespace_name LBRACE body = namespace_body RBRACE (SEMI)? { result = new Namespace(t, name, body.fst, body.snd); }
+;
+
+namespace_body returns [Tuple<List<Namespace>, List<TypeDecl>> result] { result = new Tuple<List<Namespace>, List<TypeDecl>>(); Either<Namespace, TypeDecl> member = new Either<Namespace, TypeDecl>(); }: 
+	{
+		result.fst = new List<Namespace>();
+		result.snd = new List<TypeDecl>();
+	}
+	(
+		member = namespace_member_declaration
+		{
+			if(member.IsLeft) result.fst.Add(member.Left);
+			else result.snd.Add(member.Right);		
+		}
+	)* 
+;
+
+using_directives returns [List<Ident> result] { result = null; Ident u = null; }: 
+	{ result = new List<Ident>(); }
+	(u = using_directive { result.Add(u); })*
+;
+
+using_directive returns [Ident result] { result = null; }: 
+	USING result = namespace_name SEMI
+;
+
+namespace_member_declaration returns [Either<Namespace, TypeDecl> result] { result = new Either<Namespace, TypeDecl>(); }: 
+	result = namespace_declaration
+|
+	result = type_declaration
+;
+
+type_declaration returns [TypeDecl result] { result = null; Modifier mods = Modifier.None; }: 
+	mods = modifiers result = nested_type_declaration [mods]
+;
+
+nested_type_declaration [Modifier mods] returns [TypeDecl result] { result = null; }: 
+	result = class_declaration [mods]
+| 
+	result = struct_declaration [mods] 
+| 
+	result = interface_declaration [mods]
+| 
+	result = enum_declaration [mods]
+| 
+	result = delegate_declaration [mods]
+;
+/*
+modifiers returns [Modifier result] { result = null; Modifier mod = Modifier.None; }:
+	{ result = new Modifier(); }
+	(mod = modifier { result.Add(mod); })*
+;
+*/
+modifiers returns [Modifier result] { result = Modifier.None; Modifier mod = Modifier.None; }:
+	(mod = modifier { 			
+		if ((result & mod) != 0) throw new SemanticException(string.Format("Duplicate modifier '{0}'.", mod)/*, token.getFilename(), token.getLine(), token.getColumn()*/);
+		else result |= mod;
+	})*
+;
+
+
+modifier returns [Modifier result] { result = Modifier.None; }: 
+	NEW { result = Modifier.New; }
+| 
+	PUBLIC { result = Modifier.Public; }
+| 
+	PROTECTED { result = Modifier.Protected; }
+| 
+	INTERNAL { result = Modifier.Internal; }
+| 
+	PRIVATE { result = Modifier.Private; }
+| 
+	ABSTRACT { result = Modifier.Abstract; }
+| 
+	SEALED { result = Modifier.Sealed; }
+| 
+	STATIC { result = Modifier.Static; }
+|
+	READONLY { result = Modifier.Readonly; }
+| 
+	VOLATILE { result = Modifier.Volatile; }
+| 
+	VIRTUAL { result = Modifier.Virtual; }
+| 
+	OVERRIDE { result = Modifier.Override; }
+| 
+	EXTERN { result = Modifier.Extern; }
+;
+
+//C.2.7 Classes
+class_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Tuple<Ident,int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
+	t : CLASS name = identifier (typeParamNames = type_parameter_list)? (baseTypes = class_base)? typeParams = type_parameter_constraints_clauses body = class_body (SEMI)? { result = new Class(t, mods, name, typeParamNames, baseTypes, typeParams, body); }
+;
+
+type_parameter_list returns [List<Tuple<Ident,int>> result] { result = null; Tuple<Ident,int> typeParam; }: 
+	{ result = new List<Tuple<Ident,int>>(); }
+	LANGLE typeParam = type_parameter { result.Add(typeParam); }
+	(COMMA typeParam = type_parameter { result.Add(typeParam); })* 
+	RANGLE
+;
+
+type_parameter returns [Tuple<Ident,int> result] { result = new Tuple<Ident,int>(); Ident typeParam = null; int levelKind = 0; }:
+	(ESCAPE { levelKind++; })* typeParam = identifier { result = new Tuple<Ident,int>(typeParam, levelKind); }
+;
+
+class_base returns [List<Typ> result] { result = null; Typ typ = null; }: 
+	{ result = new List<Typ>(); }
+	COLON typ = type { result.Add(typ); }
+	(COMMA typ = type { result.Add(typ); })*
+;
+
+type_parameter_constraints_clauses returns [List<TypeParam> result] { result = null; TypeParam typeParam = null; }:
+	{ result = new List<TypeParam>(); }
+	(typeParam = type_parameter_constraints_clause { result.Add(typeParam); })*
+;
+
+type_parameter_constraints_clause returns [TypeParam result] { result = null; Ident name = null; List<TypeParamCon> typeParamCons = null; }: 
+	t : WHERE name = identifier COLON typeParamCons = type_parameter_constraints { result = new TypeParam(t, name, typeParamCons); }
+;
+
+type_parameter_constraints returns [List<TypeParamCon> result] { result = null; TypeParamCon typeParamCon = null; }:
+	{ result = new List<TypeParamCon>(); }
+	typeParamCon = type_parameter_constraint { result.Add(typeParamCon); }
+	(COMMA typeParamCon = type_parameter_constraint { result.Add(typeParamCon); })*
+;
+	
+type_parameter_constraint returns [TypeParamCon result] { result = null; Typ typ = null; }: 
+	typ = type { result = new TypeParamTypeCon(typ); }
+| 
+	t1 : CLASS { result = new TypeParamClassCon(t1); }
+| 
+	t2 : STRUCT { result = new TypeParamStructCon(t2); }
+| 
+	t3 : NEW LPAREN RPAREN { result = new TypeParamCtorCon(t3); }
+;
+
+class_body returns [List<Member> result] { result = null; Modifier mods = Modifier.None; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Ident name = null; List<Param> pars = null; CtorInit ctorInit = null; List<Stmt> body = null; Expr expr = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); MethodHeader head = null; TypeDecl decl = null; }: 
+	{ result = new List<Member>(); }
+	LBRACE 
+	(
+		mods = modifiers
+		(
+			t1 : CONST typ = type vars = variable_declarators SEMI { NotDone(t1, "constant members"); }
+		|
+			(IDENTIFIER LPAREN) => name = identifier LPAREN (pars = formal_parameter_list)? RPAREN (ctorInit = constructor_initializer)? body = method_body { result.Add(new Constructor(mods, name, pars, ctorInit, body)); }
+		|
+			typ = type // field, method, property, indexer, operator
+			(
+				name = identifier
+				(
+					(
+						ASSIGN expr = variable_initializer { result.Add(new Field(mods, typ, name, expr)); }
+					|
+						{ result.Add(new Field(mods, typ, name, null)); }
+					)
+					(
+						COMMA var = variable_declarator { result.Add(new Field(mods, typ, var.fst, var.snd)); }
+					)* 
+					SEMI
+				|
+					head = method_header [typ, name] body = method_body { result.Add(new Method(mods, head, body)); }
+				|
+					LBRACE accessor_declarations RBRACE { NotDone(typ.Token, "property members"); }
+				)
+			|
+				THIS LBRACK pars = formal_parameter_list RBRACK LBRACE accessor_declarations RBRACE { NotDone(typ.Token, "indexer members"); }
+			|
+				OPERATOR (PLUS | MINUS | LNOT | NOT | INC | DEC | TRUE | FALSE | TIMES | QUOT | REM | AND | OR | XOR | SHL | SHR | EQ | NE | LANGLE | RANGLE | LE | GE) LPAREN (pars = formal_parameter_list)? RPAREN body = method_body { NotDone(typ.Token, "operator members"); }
+			)
+		|
+			t2 : EVENT typ = type vars = variable_declarators SEMI { NotDone(t2, "event members"); }
+		|
+			(t3 : IMPLICIT | t4 : EXPLICIT) typ = type LPAREN (pars = formal_parameter_list)? RPAREN body = method_body { NotDone(t3 != null ? t3: t4, "conversion members"); }
+		|
+			t5 : TILDE name = identifier LPAREN RPAREN body = method_body { NotDone(t5, "destructors"); }
+		|
+			decl = nested_type_declaration [mods] { result.Add(new NestedType(decl)); }
+		)	
+	)* 
+	RBRACE
+;
+
+constructor_initializer returns [CtorInit result] { result = null; bool b = false; List<Arg> args = null; }: 
+	t : COLON 
+	(
+		THIS { b = false; }
+	| 
+		BASE { b = true; }
+	) 
+	LPAREN (args = argument_list)? RPAREN { result = new CtorInit(t, b, args); }
+;
+
+method_header [Typ retType, Ident name] returns [MethodHeader result] { result = null; List<Tuple<Ident,int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
+	(typeParamNames = type_parameter_list)? LPAREN (pars = formal_parameter_list)? RPAREN  typeParams = type_parameter_constraints_clauses	{ result = new MethodHeader(retType, name, typeParamNames, pars, typeParams); }
+;
+
+method_body returns [List<Stmt> result] { result = null; }: 
+	result = block 
+| 
+	SEMI
+;
+
+accessor_declarations: (IDENTIFIER method_body)+;
+
+formal_parameter_list returns [List<Param> result] { result = null; Param par = null; }: 
+	par = fixed_parameter { result = new List<Param>(); result.Add(par); }
+	(COMMA par = fixed_parameter { result.Add(par); })*
+;
+
+fixed_parameter returns [Param result] { result = null; Dir dir = Dir.In; Typ typ = null; Ident name = null; }: 
+	(
+		REF { dir = Dir.InOut; }
+	| 
+		OUT { dir = Dir.Out; }
+	)? 
+	typ = type name = identifier { result = new Param(dir, typ, name); }
+;
+
+//C.2.8 Structs
+struct_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
+	t: STRUCT name = identifier (typeParamNames = type_parameter_list)? (baseTypes = class_base)? typeParams = type_parameter_constraints_clauses body = class_body (SEMI)? { result = new Struct(t, mods, name, typeParamNames, baseTypes, typeParams, body); }
+;
+
+//C.2.9 Arrays
+variable_initializer returns [Expr result] { result = null; List<Expr> exprs = null; }: 
+	result = expression 
+|
+	exprs = array_initializer { result = new ArrayInitialisation(exprs); }
+;
+
+array_initializer returns [List<Expr> result] { result = null; Expr expr = null; }: 
+	{ result = new List<Expr>(); }
+	LBRACE 
+	(
+		expr = variable_initializer { result.Add(expr); }
+		(
+			COMMA expr = variable_initializer { result.Add(expr); }
+		)*
+	)? 
+	RBRACE
+;
+
+//C.2.10 Interfaces
+interface_declaration [Modifier modifiers] returns [TypeDecl result] { result = null; }: 
+	INTERFACE IDENTIFIER (type_parameter_list)? (type_parameter_constraints_clause)* interface_body (SEMI)?;
+
+interface_body: LBRACE (interface_member_declaration)* RBRACE;
+
+interface_member_declaration { Typ typ = null; Ident name = null; }: 
+	(NEW)?
+	(
+		typ = type // field, method, property, indexer, operator
+		(
+			name = identifier
+			(
+				method_header [typ, name] SEMI
+			|
+				LBRACE (GET | SET)+ RBRACE
+			)
+		|
+			THIS LBRACK formal_parameter_list RBRACK LBRACE (IDENTIFIER SEMI)+ RBRACE
+		)
+	|
+		EVENT type IDENTIFIER SEMI
+	)
+;
+
+//C.2.11 Enums
+enum_declaration [Modifier modifiers] returns [TypeDecl result] { result = null; }: 
+	ENUM IDENTIFIER (enum_base)? enum_body (SEMI)?;
+
+enum_base: COLON (SBYTE | BYTE | SHORT | USHORT | INT | UINT | LONG | ULONG | CHAR);
+
+enum_body: LBRACE (enum_member_declarations)? RBRACE;
+
+enum_member_declarations : enum_member_declaration (COMMA enum_member_declaration)*;
+
+enum_member_declaration: IDENTIFIER ASSIGN literal;
+
+//C.2.12 Delegates
+delegate_declaration [Modifier modifiers] returns [TypeDecl result] { result = null; Typ retType = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
+	t : DELEGATE retType = type name = identifier (typeParamNames = type_parameter_list)? LPAREN (pars = formal_parameter_list)? RPAREN  typeParams = type_parameter_constraints_clauses SEMI { result = new Delegate(t, modifiers, retType, name, typeParamNames, pars, typeParams); };
+
+
+/*
+expression
+	: additiveExpression ((LANGLE|RANGLE) additiveExpression)*
+	;
+
+additiveExpression
+	: primaryExpression (PLUS primaryExpression)*
+	;
+
+primaryExpression
+	: type
+	| LPAREN expression RPAREN
+	;
+
+type
+	: (IDENTIFIER LANGLE typeList RANGLE) => IDENTIFIER LANGLE typeList RANGLE
+	| IDENTIFIER
+	;
+
+typeList
+	: IDENTIFIER (COMMA IDENTIFIER)*
+	;
+*/
+class L extends Lexer;
+
+options {
+	k = 2;
+    charVocabulary='\u0000'..'\u00FF';
+	testLiterals=false;
+}
+tokens 
+{
+/*
+    INT32_DECIMAL_INTEGER_LITERAL;
+	INT64_DECIMAL_INTEGER_LITERAL;
+    UINT32_DECIMAL_INTEGER_LITERAL;
+	UINT64_DECIMAL_INTEGER_LITERAL;
+    INT32_HEXADECIMAL_INTEGER_LITERAL;
+	INT64_HEXADECIMAL_INTEGER_LITERAL;
+    UINT32_HEXADECIMAL_INTEGER_LITERAL;
+	UINT64_HEXADECIMAL_INTEGER_LITERAL;
+	FLOAT32_REAL_LITERAL;
+	FLOAT64_REAL_LITERAL;
+	DECIMAL_REAL_LITERAL;
+*/
+	
+	ABSTRACT="abstract"; AS="as"; BASE="base"; BOOL="bool"; BREAK="break"; BYTE="byte"; CASE="case";
+	CATCH="catch"; CHAR="char"; CHECKED="checked"; CLASS="class"; CONST="const"; CONTINUE="continue"; DECIMAL="decimal";
+	DEFAULT="default"; DELEGATE="delegate"; DO="do"; DOUBLE="double"; ELSE="else"; ENUM="enum"; EVENT="event";
+	EXPLICIT="explicit"; EXTERN="extern"; FALSE="false"; FINALLY="finally"; FIXED="fixed"; FLOAT="float"; FOR="for";
+	FOREACH="foreach"; GOTO="goto"; IF="if"; IMPLICIT="implicit"; IN="in"; INT="int"; INTERFACE="interface";
+	INTERNAL="internal"; IS="is"; LOCK="lock"; LONG="long"; NAMESPACE="namespace"; NEW="new"; NULL="null";
+	OBJECT="object"; OPERATOR="operator"; OUT="out"; OVERRIDE="override"; PARAMS="params"; PRIVATE="private"; PROTECTED="protected";
+	PUBLIC="public"; READONLY="readonly"; REF="ref"; RETURN="return"; SBYTE="sbyte"; SEALED="sealed"; SHORT="short";
+	SIZEOF="sizeof"; STACKALLOC="stackalloc"; STATIC="static"; STRING="string"; STRUCT="struct"; SWITCH="switch"; THIS="this";
+	THROW="throw"; TRUE="true"; TRY="try"; TYPEOF="typeof"; UINT="uint"; ULONG="ulong"; UNCHECKED="unchecked";
+	UNSAFE="unsafe"; USHORT="ushort"; USING="using"; VIRTUAL="virtual"; VOID="void"; VOLATILE="volatile"; WHILE="while";
+	
+	WHERE="where";
+	
+	LIFT="lift"; TYPEIF="typeif"; WITHTYPE="withtype"; FORMEMBER="formember";
+	//DOT; SHL_ASSIGN; SHR_ASSIGN;
+}
+
+// C.1.1 Line terminators
+NEW_LINE: (
+	'\u000D' '\u000A' | //Carriage return character followed by line feed character
+	'\u000D' | // Carriage return character
+	'\u000A' ) // Line feed character
+//	'\u2028' | // Line separator character
+//	'\u2029' ) // Paragraph separator character
+	{ newline(); $setType(Token.SKIP); };
+
+//C.1.2 White space
+WHITESPACE: (
+	'\u0020' | '\u00A0' | /*'\u1680' | '\u180E' | '\u2000'..'\u200A' | '\u202F' | '\u205F' | '\u3000' |*/ //Any character with Unicode class Zs
+	'\u0009' | // Horizontal tab character 
+	'\u000B' | // Vertical tab character
+	'\u000C')+ // Form feed character
+	{ $setType(Token.SKIP); };
+
+//C.1.3 Comments
+COMMENT: 
+	(SINGLE_LINE_COMMENT |
+	DELIMITED_COMMENT)
+	{ $setType(Token.SKIP); };
+
+protected
+SINGLE_LINE_COMMENT: 
+	"//" (~('\u000A' | '\u000D'/* | '\u2028' | '\u2029'*/))*;
+
+protected
+DELIMITED_COMMENT:
+//	"/*" ( options {generateAmbigWarnings=false;}: {LA(1) != '*' || LA(2) != '/'}? NEW_LINE | .)* "*/";
+	"/*" ( options {generateAmbigWarnings=false;}: {LA(2) != '/'}? '*' | '\u000D' '\u000A' {newline();} | '\u000D' {newline();} | '\u000A' {newline();} | ~('*' | '\u000A' | '\u000D'))* "*/";
+
+//C.1.6 Identifiers
+IDENTIFIER:
+	IDENTIFIER_OR_KEYWORD {_ttype = testLiteralsTable(_ttype);} |
+	'@'! IDENTIFIER_OR_KEYWORD |
+	'@'! '\"'! (~('\"') | '\"' '\"' { text.Remove(text.Length - 1, 1); })* '\"'! { $setType(STRING_LITERAL); };
+
+protected
+IDENTIFIER_OR_KEYWORD: (LETTER_CHARACTER | '_') (LETTER_CHARACTER | DECIMAL_DIGIT_CHARACTER | '_' | '­')*;
+
+protected
+LETTER_CHARACTER	: (	'A'..'Z' | 'À'..'Ö' | 'Ø'..'Þ' | 'a'..'z' | 'ª' | 'µ' | 'º' | 'ß' | 'à'..'ö' | 'ø'..'ÿ');
+	
+protected
+DECIMAL_DIGIT_CHARACTER	: ('0'..'9');
+
+//C.1.8 Literals
+NUMERIC_LITERAL:
+	(DECIMAL_DIGIT)+ (
+		/*empty*/ { $setType(INT32_DECIMAL_INTEGER_LITERAL); } |
+		LONG_SUFFIX { $setType(INT64_DECIMAL_INTEGER_LITERAL); } |
+		UNSIGNED_SUFFIX { $setType(UINT32_DECIMAL_INTEGER_LITERAL); } |
+		UNSIGNED_LONG_SUFFIX {$setType(UINT64_DECIMAL_INTEGER_LITERAL); } |
+		('.' (DECIMAL_DIGIT)+ (EXPONENT_PART)? (
+			(DOUBLE_SUFFIX)? { $setType(FLOAT64_REAL_LITERAL); }  |
+			FLOAT_SUFFIX { $setType(FLOAT32_REAL_LITERAL); }  |
+			DECIMAL_SUFFIX { $setType(DECIMAL_REAL_LITERAL); } )) |
+		(EXPONENT_PART (
+			(DOUBLE_SUFFIX)? { $setType(FLOAT64_REAL_LITERAL); }  |
+			FLOAT_SUFFIX { $setType(FLOAT32_REAL_LITERAL); }  |
+			DECIMAL_SUFFIX { $setType(DECIMAL_REAL_LITERAL); } )) |
+		DOUBLE_SUFFIX { $setType(FLOAT64_REAL_LITERAL); }  |
+		FLOAT_SUFFIX { $setType(FLOAT32_REAL_LITERAL); }  |
+		DECIMAL_SUFFIX { $setType(DECIMAL_REAL_LITERAL); } ) |
+	'0'! ('x'! | 'X'!) (HEX_DIGIT)+ (
+		/*empty*/ { $setType(INT32_HEXADECIMAL_INTEGER_LITERAL); } |
+		LONG_SUFFIX { $setType(INT64_HEXADECIMAL_INTEGER_LITERAL); } |
+		UNSIGNED_SUFFIX { $setType(UINT32_HEXADECIMAL_INTEGER_LITERAL); } |
+		UNSIGNED_LONG_SUFFIX {$setType(UINT64_HEXADECIMAL_INTEGER_LITERAL); } ) |
+	'.' (DECIMAL_DIGIT)+ (EXPONENT_PART)? (
+		(DOUBLE_SUFFIX)? { $setType(FLOAT64_REAL_LITERAL); }  |
+		FLOAT_SUFFIX { $setType(FLOAT32_REAL_LITERAL); }  |
+		DECIMAL_SUFFIX { $setType(DECIMAL_REAL_LITERAL); } ) |
+	'.' { $setType(DOT); } ;
+
+protected
+DECIMAL_DIGIT: ('0'..'9');
+	
+protected
+HEX_DIGIT: ('0'..'9' | 'A'..'F' | 'a'..'f');
+
+protected
+LONG_SUFFIX: ('L'! | 'l'!);
+
+protected 
+UNSIGNED_SUFFIX: ('U'! | 'u'!);
+
+protected 
+UNSIGNED_LONG_SUFFIX: ('U'! 'L'! | 'U'! 'l'! | 'u'! 'L'! | 'u'! 'l'! | 'L'! 'U'! | 'L'! 'u'! | 'l'! 'U'! | 'l'! 'u'!);
+
+protected
+EXPONENT_PART: ('E' | 'e') ('+' | '-')? (DECIMAL_DIGIT)+;
+
+protected
+FLOAT_SUFFIX: ('F'! | 'f'!);
+
+protected
+DOUBLE_SUFFIX: ('D'! | 'd'!);
+
+protected
+DECIMAL_SUFFIX: ('M'! | 'm'!);
+
+CHARACTER_LITERAL:
+	'\''! SINGLE_CHARACTER '\''! ;
+
+protected
+SINGLE_CHARACTER:
+		~('\'' | '\"' | '\\' | '\n' | '\r') |
+		'\\' '\'' { $setText("\'"); } |
+		'\\' '\"' { $setText("\""); } |
+		'\\' '\\' { $setText("\\"); } |
+		'\\' '0' { $setText("\0"); } |
+//		'\\' 'a' { $setText("\a"); } |
+		'\\' 'b' { $setText("\b"); } |
+		'\\' 'f' { $setText("\f"); } |
+		'\\' 'n' { $setText("\n"); } |
+		'\\' 'r' { $setText("\r"); } |
+		'\\' 't' { $setText("\t"); };
+//		'\\' 'v' { $setText("\v"); }
+//		'\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT { $setText("\v"); }
+
+STRING_LITERAL:
+	'\"'! (SINGLE_CHARACTER)* '\"'! ;
+//	'@'! '\"'! (~('\"') | '\"' '\"' { $setText("\""); })* '\"'!
+
+//C.1.9 Operators and punctuators
+LBRACE:	'{'; RBRACE: '}'; LBRACK: '['; RBRACK: ']'; LPAREN: '('; RPAREN: ')'; /*DOT: '.';*/ COMMA: ','; COLON: ':'; SEMI: ';';
+PLUS: '+'; MINUS: '-'; TIMES: '*'; QUOT: '/'; REM: '%'; AND: '&'; OR: '|'; XOR: '^'; LNOT: '!'; NOT: '`';
+ASSIGN: '='; LANGLE: '<'; RANGLE: '>'; COND: '?'; INC: '+' '+'; DEC: '-' '-'; LAND: '&' '&'; LOR: '|' '|'; SHL: '<' '<' (|'=' { $setType(SHL_ASSIGN); }); SHR: '>' '>' (|'=' { $setType(SHR_ASSIGN); });
+EQ: '=' '='; NE: '!' '='; LE: '<' '='; GE: '>' '='; PLUS_ASSIGN: '+' '='; MINUS_ASSIGN: '-' '='; TIMES_ASSIGN: '*' '='; QUOT_ASSIGN: '/' '='; REM_ASSIGN: '%' '='; AND_ASSIGN: '&' '=';
+OR_ASSIGN: '|' '='; XOR_ASSIGN: '^' '='; ARROW: '-' '>';
+
+LMETA: '<' '|'; RMETA: '|' '>'; ESCAPE: '~'; SEMI_ASSIGN: ';' '=';
