@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -101,7 +102,7 @@ namespace Metaphor.Compiler
 
 			public static Value FromCode(Code code)
 			{
-				if (code == null) throw new ArgumentNullException("code");
+				Contract.Requires(code != null);
 				bool isVoid = code.GetMType() == M.PrimType.Void;
 				bool isAssignable = code.IsAssignable();
 				if (isVoid && !isAssignable) return new NoValue(code);
@@ -232,13 +233,22 @@ namespace Metaphor.Compiler
 
 			public MethodGroup(string name, M.Code expr, M.MMethodInfo[] methods)
 			{
-				this.name = name;
+			    Contract.Requires(name != null);
+			    Contract.Requires(methods != null && methods.Length != 0);
+			    this.name = name;
 				this.expr = expr;
-				if (methods == null || methods.Length == 0) throw new ArgumentException("is null or empty", "methods");
 				this.methods = methods;
 			}
 
-			public override string ToString()
+		    [ContractInvariantMethod]
+		    private void ObjectInvariant()
+		    {
+		        Contract.Invariant(name != null);
+		        Contract.Invariant(methods != null);
+                Contract.Invariant(methods.Length != 0);
+		    }
+
+		    public override string ToString()
 			{
 				return "method group";
 			}
@@ -272,13 +282,20 @@ namespace Metaphor.Compiler
 		public Arg(Dir dir, Expr expr)
 			: base(expr.Token)
 		{
-			if (!Enum.IsDefined(typeof(Dir), dir)) throw new ArgumentOutOfRangeException("dir");
+			Contract.Requires(expr != null);
+			if (!Enum.IsDefined(typeof(Dir), dir)) throw new ArgumentOutOfRangeException(nameof(dir));
 			this.dir = dir;
-			if (expr == null) throw new ArgumentNullException("expr");
 			this.expr = expr;
 		}
 
-		public M.Code Compile(CompileState state)
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(expr != null);
+        }
+
+
+        public M.Code Compile(CompileState state)
 		{
 			if ((dir & Dir.Out) != 0) return new Ref(expr.CompileLValue(state));
 			else return expr.CompileRValue(state);
@@ -381,11 +398,17 @@ namespace Metaphor.Compiler
 		public Lift(IToken token, Expr expr)
 			: base(token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
-			this.expr = expr;
+		    Contract.Requires(expr != null);
+		    this.expr = expr;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			if (state.GetLevel() <= 0) throw state.ThrowTypeError(this, "Lift cannot occur at level 0.");
 			state.LowerLevel();
@@ -443,7 +466,7 @@ namespace Metaphor.Compiler
 		public Name(Ident name, List<Typ> typeArgs)
 			: base(name.Token)
 		{
-			if (name == null) throw new ArgumentNullException("name");
+			Contract.Requires(name != null);
 			this.name = name.Name;
 			this.typeArgs = CheckNull<Typ>(typeArgs);
 		}
@@ -512,13 +535,19 @@ namespace Metaphor.Compiler
 		public Increment(Expr expr, AssignOp op, AssignRet ret)
 			: base(expr.Token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
 			this.expr = expr;
 			this.op = op;
 			this.ret = ret;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			Code mExpr = expr.CompileLValue(state);
 			if (!BinaryOp.IsNumeric(mExpr.GetMType())) throw state.ThrowTypeError(this, "The operand of increment must be a numeric type but was found to have type '{1}'.", mExpr.GetMType());
@@ -552,11 +581,17 @@ namespace Metaphor.Compiler
 		public UnaryOp(IToken token, Expr x)
 			: base(token)
 		{
-			if (x == null) throw new ArgumentNullException("x");
-			this.a = x;
+		    Contract.Requires(x != null);
+		    this.a = x;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(a != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			Code mExpr = a.CompileRValue(state);
 			return Value.FromCode(CompilerOp(state, mExpr));
@@ -687,10 +722,10 @@ namespace Metaphor.Compiler
 		public BinaryOp(string name, Expr x, Expr y)
 			: base(x.Token)
 		{
+			Contract.Requires(x != null);
+			Contract.Requires(y != null);
 			this.name = name;
-			if (x == null) throw new ArgumentNullException("x");
 			this.a = x;
-			if (y == null) throw new ArgumentNullException("y");
 			this.b = y;
 		}
 
@@ -1027,10 +1062,10 @@ namespace Metaphor.Compiler
 		public MemberAccess(Expr expr, Ident name, List<Typ> typeArgs)
 			: base(expr.Token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
+			Contract.Requires(name != null);
 			this.expr = expr;
 			this.predefinedType = null;
-			if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 			this.typeArgs = typeArgs;
 		}
@@ -1038,15 +1073,22 @@ namespace Metaphor.Compiler
 		public MemberAccess(Typ predefinedType, Ident name, List<Typ> typeArgs)
 			: base(predefinedType.Token)
 		{
+			Contract.Requires(predefinedType != null);
+			Contract.Requires(name != null);
 			this.expr = null;
-			if (predefinedType == null) throw new ArgumentNullException("predefinedType");
 			this.predefinedType = predefinedType;
-			if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 			this.typeArgs = typeArgs;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	        Contract.Invariant(name != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			Kind exprKind;
 			if (expr != null) exprKind = expr.Compile(state);
@@ -1122,14 +1164,21 @@ namespace Metaphor.Compiler
 		public ElementAccess(Expr expr, List<Expr> exprs)
 			: base(expr.Token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
+			Contract.Requires(exprs != null);
 			this.expr = expr;
-			if (exprs == null) throw new ArgumentNullException("exprs");
 			if (exprs.Count == 0) throw new ArgumentException("exprs.Count == 0", "exprs");
 			this.indices = exprs;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	        Contract.Invariant(indices != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			Code mExpr = expr.CompileRValue(state);
 			MType mType = mExpr.GetMType();
@@ -1158,12 +1207,19 @@ namespace Metaphor.Compiler
 		public Invocation(Expr expr, List<Arg> args)
 			: base(expr.Token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
 			this.expr = expr;
 			this.args = args != null ? args : new List<Arg>();
 		}
 
-		public override Kind Compile(CompileState state)
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(expr != null);
+        }
+
+
+        public override Kind Compile(CompileState state)
 		{
 			Kind exprKind = expr.Compile(state);
 			M.Code[] mArgs = Arg.Compile(state, args);
@@ -1240,12 +1296,18 @@ namespace Metaphor.Compiler
 		public ObjectCreation(IToken token, Typ type, List<Arg> args)
 			: base(token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
 			this.type = type;
 			this.args = args != null ? args : new List<Arg>();
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(type != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			MType mType = type.Compile(state);
 			M.Code[] mArgs = Arg.Compile(state, args);
@@ -1269,10 +1331,10 @@ namespace Metaphor.Compiler
 		public ArrayCreation(IToken token, ArrayType type, List<Expr> dims)
 			: base(token)
 		{
-			if(type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
+			Contract.Requires(dims != null);
 			this.elemType = type.type;
 			this.rank = type.rank;
-			if (dims == null) throw new ArgumentNullException("dims");
 			this.dims = dims;
 			this.init = null;
 		}
@@ -1280,15 +1342,21 @@ namespace Metaphor.Compiler
 		public ArrayCreation(IToken token, ArrayType type, ArrayInitialisation init)
 			: base(token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
+			Contract.Requires(init != null);
 			this.elemType = type.type;
 			this.rank = type.rank; 
 			this.dims = null;
-			if (init == null) throw new ArgumentNullException("init");
 			this.init = init;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(dims != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			MType mType = elemType.Compile(state);
 			if (dims != null)
@@ -1314,11 +1382,17 @@ namespace Metaphor.Compiler
 		public ArrayInitialisation(List<Expr> exprs)
 			: base(FirstToken<Expr>(exprs))
 		{
-			if (exprs == null) throw new ArgumentNullException("exprs");
-			this.exprs = exprs;
+		    Contract.Requires(exprs != null);
+		    this.exprs = exprs;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(exprs != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			throw new NotImplementedException();
 		}
@@ -1332,13 +1406,20 @@ namespace Metaphor.Compiler
 		public Cast(IToken token, Typ type, Expr expr)
 			: base(token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
+			Contract.Requires(expr != null);
 			this.type = type;
-			if (expr == null) throw new ArgumentNullException("expr");
 			this.expr = expr;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(type != null);
+	        Contract.Invariant(expr != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			MType destType = type.Compile(state);
 			state.PushExpectedType(destType);
@@ -1444,11 +1525,17 @@ namespace Metaphor.Compiler
 		public EscapeExpr(IToken token, Expr expr)
 			: base(token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
-			this.expr = expr;
+		    Contract.Requires(expr != null);
+		    this.expr = expr;
 		}
 
-		public override Kind Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	    }
+
+	    public override Kind Compile(CompileState state)
 		{
 			if (state.level <= 0) throw state.ThrowTypeError(this, "Escape cannot occur at level 0.");
 			state.LowerLevel();
@@ -1472,9 +1559,9 @@ namespace Metaphor.Compiler
 		public Function(IToken token, Ident name, List<Param> @params, List<Stmt> stmts)
 			: base(token)
 		{
+			Contract.Requires(stmts != null);
 			this.name = name != null ? name.Name : null;
 			this.@params = CheckNull<Param>(@params);
-			if (stmts == null) throw new ArgumentNullException("stmts");
 			this.stmts = stmts;
 		}
 

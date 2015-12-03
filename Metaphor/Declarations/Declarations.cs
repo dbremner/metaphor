@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -1013,7 +1014,7 @@ namespace Metaphor
 
 		public Function(string name, MType delegateType, string[] paramNames): base(name)
 		{
-			if (delegateType == null) throw new ArgumentNullException("delegateType");
+			Contract.Requires(delegateType != null);
 			this.delegateType = delegateType;
 
 			ParamType[] paramTypes;

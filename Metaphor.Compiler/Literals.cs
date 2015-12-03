@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using M = Metaphor;
 using IToken = antlr.IToken;
 
@@ -145,7 +146,8 @@ namespace Metaphor.Compiler
 		public LitString(IToken token, string val)
 			: base(token)
 		{
-			this.val = val;
+		    Contract.Requires(val != null);
+		    this.val = val;
 		}
 
 		public override Kind Compile(CompileState state)

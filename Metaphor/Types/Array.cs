@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -26,9 +27,9 @@ namespace Metaphor
 
 		public ArrayType(MType elementType, int rank)
 		{
-			if (elementType == null) throw new ArgumentNullException("elementType");
+			Contract.Requires(elementType != null);
+			Contract.Requires(rank > 0, "cannot be non-positive");
 			this.elementType = elementType;
-			if (rank <= 0) throw new ArgumentOutOfRangeException("rank", "cannot be non-positive");
 			this.rank = rank;
 		}
 

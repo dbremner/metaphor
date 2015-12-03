@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -140,13 +141,19 @@ namespace Metaphor.Compiler
 		public ClassType(ClassType parent, Ident name, List<Typ> args)
 			: base(parent != null ? parent.Token : name.Token)
 		{
-			this.parent = parent;
-			if (name == null) throw new ArgumentNullException("name");
+            Contract.Requires(name != null);
+            this.parent = parent;
 			this.name = name.Name;
 			this.args = CheckNull<Typ>(args);
 		}
 
-		public string CompileNamespace(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(name != null);
+	    }
+
+	    public string CompileNamespace(CompileState state)
 		{
 			if (args.Count == 0)
 			{
@@ -202,9 +209,9 @@ namespace Metaphor.Compiler
 
 		public static ArrayType Create(Typ type, List<int> ranks)
 		{
-			if(type == null) throw new ArgumentNullException("type");
-			if(ranks == null) throw new ArgumentNullException("ranks");
-			if(ranks.Count == 0) throw new ArgumentException("ranks.Count==0", "ranks");
+			Contract.Requires(type != null);
+			Contract.Requires(ranks != null);
+			Contract.Requires(ranks.Count != 0, nameof(ranks));
 			
 			ArrayType arrayType = new ArrayType(type, ranks[ranks.Count - 1]);
 			for (int i = ranks.Count - 2; i >= 0; i++)
@@ -215,9 +222,9 @@ namespace Metaphor.Compiler
 		public ArrayType(Typ type, int rank)
 			: base(type.Token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
+			Contract.Requires(rank > 0, nameof(rank));
 			this.type = type;
-			if (rank <= 0) throw new ArgumentOutOfRangeException("rank", rank, "rank <= 0");
 			this.rank = rank;
 		}
 

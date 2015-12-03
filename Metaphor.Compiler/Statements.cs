@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -43,7 +44,7 @@ namespace Metaphor.Compiler
 		public Label(Ident name)
 			: base(name.Token)
 		{
-			if (name == null) throw new ArgumentNullException("name");
+		    Contract.Requires(name != null);
 		}
 
 		public override Code Compile(CompileState state)
@@ -73,11 +74,17 @@ namespace Metaphor.Compiler
 		public Block(List<Stmt> stmts)
 			: base(FirstToken<Stmt>(stmts))
 		{
-			if (stmts == null) throw new ArgumentNullException("stmts");
-			this.stmts = stmts;
+		    Contract.Requires(stmts != null);
+		    this.stmts = stmts;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(stmts != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			state.PushBlock();
 			Code mStmt = Stmt.Compile(state, stmts);
@@ -95,24 +102,31 @@ namespace Metaphor.Compiler
 
 		public static void Add(List<Stmt> stmts, Typ type, List<Tuple<Ident, Expr>> decls)
 		{
-            if (stmts == null) throw new ArgumentNullException("stmts");
-            if (type == null) throw new ArgumentNullException("type");
-            if (decls == null || decls.Count == 0) throw new ArgumentException("decls");
             foreach (Tuple<Ident, Expr> decl in decls)
+            Contract.Requires(stmts != null);
+            Contract.Requires(type != null);
+            Contract.Requires(decls != null && decls.Count != 0);
                 stmts.Add(new LocalDecl(type, decl.fst, decl.snd));
 		}
 
 		public LocalDecl(Typ type, Ident name, Expr init)
 			: base(type.Token)
 		{
-            if (type == null) throw new ArgumentNullException("type");
+            Contract.Requires(type != null);
+            Contract.Requires(name != null);
 			this.type = type;
-            if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 			this.init = init;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(type != null);
+	        Contract.Invariant(name != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			MType mType = type.CompileFor(state);
 			Code mExpr = null;
@@ -172,14 +186,21 @@ namespace Metaphor.Compiler
 		public If(IToken token, Expr cond, Stmt ifTrue, Stmt ifFalse)
 			: base(token)
 		{
-			if (cond == null) throw new ArgumentNullException("cond");
+			Contract.Requires(cond != null);
+			Contract.Requires(ifTrue != null);
 			this.cond = cond;
-			if (ifTrue == null) throw new ArgumentNullException("ifTrue");
 			this.ifTrue = ifTrue;
 			this.ifFalse = ifFalse;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(cond != null);
+	        Contract.Invariant(ifTrue != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			Code mCond = cond.CompileRValue(state);
 			if (mCond.GetMType() != M.PrimType.Boolean) throw state.ThrowTypeError(this,"If condition must have boolean type.");
@@ -199,13 +220,20 @@ namespace Metaphor.Compiler
 		public Switch(IToken token, Expr expr, List<Case> cases)
 			: base(token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
+			Contract.Requires(cases != null);
 			this.expr = expr;
-			if (cases == null) throw new ArgumentNullException("cases");
 			this.cases = cases;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	        Contract.Invariant(cases != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			throw new Exception("The method or operation is not implemented.");
 		}
@@ -218,10 +246,16 @@ namespace Metaphor.Compiler
 
 		public Case(IToken token, List<Literal> literals, List<Stmt> stmts)
 		{
+			Contract.Requires(stmts != null);
 			this.literals = literals;
-			if (stmts == null) throw new ArgumentNullException("stmts");
 			this.stmts = stmts;
 		}
+
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(stmts != null);
+	    }
 	}
 
 	public class While : Stmt
@@ -232,13 +266,20 @@ namespace Metaphor.Compiler
 		public While(IToken token, Expr cond, Stmt body)
 			: base(token)
 		{
-			if (cond == null) throw new ArgumentNullException("cond");
+			Contract.Requires(cond != null);
+			Contract.Requires(body != null);
 			this.cond = cond;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(cond != null);
+	        Contract.Invariant(body != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			Code mCond = cond.CompileRValue(state);
 			if (mCond.GetMType() != M.PrimType.Boolean) throw state.ThrowTypeError(this, "While condition must have boolean type.");
@@ -255,13 +296,20 @@ namespace Metaphor.Compiler
 		public Do(IToken token, Stmt body, Expr cond)
 			: base(token)
 		{
-			if (cond == null) throw new ArgumentNullException("cond");
+			Contract.Requires(cond != null);
+			Contract.Requires(body != null);
 			this.cond = cond;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(cond != null);
+	        Contract.Invariant(body != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			throw state.ThrowNotImplemented(this, "do loops");
 		}
@@ -278,26 +326,32 @@ namespace Metaphor.Compiler
 		public For(IToken token, LocalDecl init, Expr cond, List<Expr> loop, Stmt body)
 			: base(token)
 		{
+			Contract.Requires(body != null);
 			this.initVar = init;
 			this.initExprs = null;
 			this.cond = cond;
 			this.loop = loop;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
 		public For(IToken token, List<Expr> init, Expr cond, List<Expr> loop, Stmt body)
 			: base(token)
 		{
+			Contract.Requires(body != null);
 			this.initVar = null;
 			this.initExprs = init;
 			this.cond = cond;
 			this.loop = loop;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(body != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			state.PushBlock();
 			List<Code> mInit = new List<Code>();
@@ -350,17 +404,26 @@ namespace Metaphor.Compiler
 		public Foreach(IToken token, Typ type, Ident ident, Expr expr, Stmt body)
 			: base(token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
+			Contract.Requires(type != null);
+			Contract.Requires(ident != null);
+			Contract.Requires(expr != null);
+			Contract.Requires(body != null);
 			this.type = type;
-			if (ident == null) throw new ArgumentNullException("ident");
 			this.ident = ident.Name;
-			if (expr == null) throw new ArgumentNullException("expr");
 			this.expr = expr;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(type != null);
+	        Contract.Invariant(ident != null);
+	        Contract.Invariant(expr != null);
+	        Contract.Invariant(body != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			Code mExpr = expr.CompileRValue(state);
 			MType elemType = type.Compile(state);
@@ -458,11 +521,17 @@ namespace Metaphor.Compiler
 		public Throw(IToken token, Expr expr)
 			: base(token)
 		{
-			if (expr == null) throw new ArgumentNullException("exc");
-			this.expr = expr;
+		    Contract.Requires(expr != null);
+		    this.expr = expr;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(expr != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			Code mExpr = expr.CompileRValue(state);
 			//if (!excType.IsSubTypeOf(M.PrimType.Exception))
@@ -480,14 +549,20 @@ namespace Metaphor.Compiler
 		public Try(IToken token, List<Stmt> stmts, List<Catch> catches, Finally fin)
 			: base(token)
 		{
-			if (stmts == null) throw new ArgumentNullException("stmts");
+			Contract.Requires(stmts != null);
+			Contract.Requires(catches != null || fin != null);
 			this.stmts = stmts;
-			if (catches == null && fin == null) throw new ArgumentException("catches == null && fin == null");
 			this.catches = catches;
 			this.fin = fin.stmts;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(stmts != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			throw state.ThrowNotImplemented(this, "try/catch/finally blocks");
 		}
@@ -501,9 +576,15 @@ namespace Metaphor.Compiler
 
 		public Catch(IToken token, Typ typ, Ident name, List<Stmt> stmts)
 		{
-			if (typ == null && name != null) throw new ArgumentException("typ == null && name != null");
-			if (stmts == null) throw new ArgumentNullException("stmts");
+		    Contract.Requires(typ != null || name == null);
+		    Contract.Requires(stmts != null);
 		}
+
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(stmts != null);
+	    }
 	}
 
 	public class Finally
@@ -512,7 +593,7 @@ namespace Metaphor.Compiler
 
 		public Finally(IToken token, List<Stmt> stmts)
 		{
-			if (stmts == null) throw new ArgumentNullException("stmts");
+		    Contract.Requires(stmts != null);
 		}
 	}
 
@@ -528,21 +609,28 @@ namespace Metaphor.Compiler
 		public TypeIf(IToken token, List<Tuple<Ident, int>> patternVars, Ident ident, Typ pattern, List<TypeParam> constraints, Stmt ifTrue, Stmt ifFalse)
 			: base(token)
 		{
-			this.patternVars = CheckNull<Tuple<Ident, int>>(patternVars);
+			Contract.Requires(ident != null);
+			Contract.Requires(pattern != null);
+			Contract.Requires(ifTrue != null);
+			this.patternVars = CheckNull<Collections.Tuple<Ident, int>>(patternVars);
 			for (int i = 0; i < this.patternVars.Count; i++)
 				if (this.patternVars[i].snd < 1) this.patternVars[i] = new Tuple<Ident, int>(this.patternVars[i].fst, 1);
 
-			if (ident == null) throw new ArgumentNullException("name");
 			this.name = ident.Name;
-			if (pattern == null) throw new ArgumentNullException("type");
 			this.pattern = pattern;
 			this.constraints = CheckNull<TypeParam>(constraints);
-			if (ifTrue == null) throw new ArgumentNullException("ifTrue");
 			this.ifTrue = ifTrue;
 			this.ifFalse = ifFalse;
 		}
 
-		public override Code Compile(CompileState state)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(pattern != null);
+	        Contract.Invariant(ifTrue != null);
+	    }
+
+	    public override Code Compile(CompileState state)
 		{
 			TypeVar typeVar = state.LookupTypeVar(name) as TypeVar;
 			if (typeVar == null) throw state.ThrowTypeError(this, "The type varible '{0}' is not in scope.", name);
@@ -582,11 +670,11 @@ namespace Metaphor.Compiler
 		public WithType(IToken token, Ident ident, Expr expr, Stmt stmt)
 			: base(token)
 		{
-			if (ident == null) throw new ArgumentNullException("ident");
+			Contract.Requires(ident != null);
+			Contract.Requires(expr != null);
+			Contract.Requires(stmt != null);
 			this.name = ident.Name;
-			if (expr == null) throw new ArgumentNullException("expr");
 			this.expr = expr;
-			if (stmt == null) throw new ArgumentNullException("stmt");
 			this.stmt = stmt;
 		}
 
@@ -613,18 +701,18 @@ namespace Metaphor.Compiler
 		public ForMember(IToken token, bool isStatic, string retType, Ident ident, List<Tuple<string, bool>> @params, Typ type, Stmt stmt)
 			: base(token)
 		{
-			if (ident == null) throw new ArgumentNullException("ident");
+			Contract.Requires(ident != null);
+			Contract.Requires(retType != null);
+			Contract.Requires(type != null);
+			Contract.Requires(stmt != null);
 			this.name = ident.Name;
 			this.isStatic = isStatic;
-			if (retType == null) throw new ArgumentNullException("retType");
 			this.retType = retType;
 			if (@params != null)
 			{
 				this.@params = @params;
 			}
-			if (type == null) throw new ArgumentNullException("type");
 			this.type = type;
-			if (stmt == null) throw new ArgumentNullException("stmt");
 			this.stmt = stmt;
 		}
 
@@ -684,8 +772,8 @@ namespace Metaphor.Compiler
 		public Expression(Expr expr)
 			: base(expr.Token)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
-			this.expr = expr;
+		    Contract.Requires(expr != null);
+		    this.expr = expr;
 		}
 
 		public override Code Compile(CompileState state)

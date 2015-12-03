@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
@@ -687,11 +688,11 @@ namespace Metaphor
 
 		public MethodInvoke(Code expr, MMethodInfo method, Code[] args)
 		{
-			if (expr == null && !method.IsStatic()) throw new ArgumentNullException("expr");
+			Contract.Requires(method != null);
+			Contract.Requires(args != null);
+            Contract.Requires(expr != null || method.IsStatic());
 			this.expr = expr;
-			if (method == null) throw new ArgumentNullException("method");
 			this.method = method;
-			if (args == null) throw new ArgumentNullException("args");
 			this.args = args;
 		}
 
@@ -811,9 +812,9 @@ namespace Metaphor
 
 		public ElementAccess(Code expr, Code index)
 		{
-			if (expr == null) throw new ArgumentNullException("expr");
+			Contract.Requires(expr != null);
+			Contract.Requires(index != null);
 			this.expr = expr;
-			if (index == null) throw new ArgumentNullException("index");
 			this.index = index;
 			MType arrayType = expr.GetMType();
 			if (!arrayType.IsArray()) throw new ArgumentException("not an array", "expr");
@@ -1022,7 +1023,7 @@ namespace Metaphor
 
 		public FixedElementAccess(FixedArrayCreate fixedArray, int index)
 		{
-			if (fixedArray == null) throw new ArgumentNullException("fixedArray");
+			Contract.Requires(fixedArray != null);
 			this.fixedArray = fixedArray;
 			if (index < 0 || index >= fixedArray.length) throw new ArgumentOutOfRangeException("index");
 			this.index = index;

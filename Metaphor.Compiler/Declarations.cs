@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -29,12 +30,18 @@ namespace Metaphor.Compiler
 		public TypeDecl(IToken token, Modifier mods, Ident name)
 			: base(token)
 		{
+			Contract.Requires(name != null);
 			this.mods = mods;
-			if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 		}
 
-		public abstract void CompileTypes(CompileState state, M.MModuleBuilder mMod);
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(name != null);
+	    }
+
+	    public abstract void CompileTypes(CompileState state, M.MModuleBuilder mMod);
 
 		public abstract void CompileMembers(CompileState state);
 
@@ -49,15 +56,21 @@ namespace Metaphor.Compiler
 		public TypeParam(IToken token, Ident name, List<TypeParamCon> cons)
 			: base(token)
 		{
-			if (name == null) throw new ArgumentNullException("name");
+			Contract.Requires(name != null);
+			Contract.Requires(cons != null);
 			this.name = name.Name;
-			if (cons == null) throw new ArgumentNullException("cons");
 			this.cons = cons;
 		}
 
-		public enum Location { Class, Method, Stmt };
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(name != null);
+        }
 
 		public static TypeVarDecl[] Compile(CompileState state, List<Tuple<Ident, int>> names, List<TypeParam> @params, Location loc)
+        public enum Location { Class, Method, Stmt };
+
 		{
 			List<TypeVarDecl> result = new List<TypeVarDecl>();
 			foreach (Tuple<Ident, int> name in names)
@@ -124,11 +137,17 @@ namespace Metaphor.Compiler
 		public TypeParamTypeCon(Typ type)
 			: base(type.Token)
 		{
-			if (type == null) throw new ArgumentNullException("type");
-			this.type = type;
+		    Contract.Requires(type != null);
+		    this.type = type;
 		}
 
-		public override void Compile(CompileState state, TypeVarCon typeCon, string name)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(type != null);
+	    }
+
+	    public override void Compile(CompileState state, TypeVarCon typeCon, string name)
 		{
 			type.Compile(state);
 			if (!type.mType.IsInterface())
@@ -408,7 +427,7 @@ namespace Metaphor.Compiler
 		public Delegate(IToken token, Modifier mods, Typ returnType, Ident name, List<Tuple<Ident, int>> typeParamNames, List<Param> @params, List<TypeParam> typeParams)
 			: base(token, mods, name, typeParamNames, typeParams)
 		{
-			if (returnType == null) throw new ArgumentNullException("returnType");
+			Contract.Requires(returnType != null);
 			this.returnType = returnType;
 			this.@params = CheckNull<Param>(@params);
 		}
@@ -446,15 +465,23 @@ namespace Metaphor.Compiler
 		public Param(Dir dir, Typ type, Ident name)
 			: base(type.Token)
 		{
-			if (!Enum.IsDefined(typeof(Dir), dir)) throw new ArgumentOutOfRangeException("dir");
+			Contract.Requires(Enum.IsDefined(typeof (Dir), dir));
+			Contract.Requires(type != null);
+			Contract.Requires(name != null);
 			this.dir = dir;
-			if (type == null) throw new ArgumentNullException("type");
 			this.type = type;
-			if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 		}
 
-		public ParamDecl Compile(CompileState state)
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(name != null);
+            Contract.Invariant(type != null);
+        }
+
+
+        public ParamDecl Compile(CompileState state)
 		{
 			type.Compile(state);
 			mParamDecl = new MethodParamDecl(name, ParamType.Create(type.mType, (dir & Dir.Out) != 0));

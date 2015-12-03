@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -27,12 +28,18 @@ namespace Metaphor.Compiler
 		public Member(IToken token, Modifier mods, Ident name)
 			: base(token)
 		{
+			Contract.Requires(name != null);
 			this.mods = mods;
-			if (name == null) throw new ArgumentNullException("name");
 			this.name = name.Name;
 		}
 
-		public abstract void CompileMembers(CompileState state, M.MTypeBuilder mClass);
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(name != null);
+	    }
+
+	    public abstract void CompileMembers(CompileState state, M.MTypeBuilder mClass);
 
 		public abstract void CompileCode(CompileState state);
 	}
@@ -77,12 +84,18 @@ namespace Metaphor.Compiler
 			: base(name.Token, mods, name)
 		{
 			this.@params = CheckNull<Param>(@params);
+			Contract.Requires(body != null);
 			this.ctorInit = ctorInit;
-			if (body == null) throw new ArgumentNullException("body");
 			this.body = body;
 		}
 
-		public override void CompileMembers(CompileState state, M.MTypeBuilder mClass)
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(body != null);
+	    }
+
+	    public override void CompileMembers(CompileState state, M.MTypeBuilder mClass)
 		{
 			if(name != mClass.name) throw state.ThrowTypeError(this, "Constructor '{0}' must have the same name as its type '{0}'.", name, mClass.name);
 			if ((mods & Modifier.Static) != 0)
@@ -197,7 +210,7 @@ namespace Metaphor.Compiler
 		public Method(Modifier mods, MethodHeader head, List<Stmt> body)
 			: base(head.type.Token, mods, head.name)
 		{
-			if (head.type == null) throw new ArgumentNullException("head.type");
+			Contract.Requires(head.type != null);
 			this.returnType = head.type;
 			this.typeParamNames = CheckNull<Tuple<Ident, int>>(head.typeParamNames);
 			this.@params = CheckNull<Param>(head.@params);

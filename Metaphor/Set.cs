@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Metaphor.Collections
 {
@@ -141,8 +142,8 @@ namespace Metaphor.Collections
 
 		public static Tuple<A, B>[] Zip(A[] a, B[] b)
 		{
-			if (a == null) throw new ArgumentNullException("a");
-			if (b == null) throw new ArgumentNullException("b");
+			Contract.Requires(a != null);
+			Contract.Requires(b != null);
 
 			int n = Math.Min(a.Length, b.Length);
 			Tuple<A, B>[] zip = new Tuple<A, B>[n];
@@ -153,7 +154,7 @@ namespace Metaphor.Collections
 
 		public static Tuple<A[], B[]> Unzip(Tuple<A, B>[] zip)
 		{
-			if (zip == null) throw new ArgumentNullException("zip");
+			Contract.Requires(zip != null);
 
 			Tuple<A[], B[]> tuple = new Tuple<A[], B[]>();
 			Unzip(zip, out tuple.fst, out tuple.snd);
@@ -162,7 +163,7 @@ namespace Metaphor.Collections
 
 		public static void Unzip(Tuple<A, B>[] zip, out A[] a, out B[] b)
 		{
-			if (zip == null) throw new ArgumentNullException("zip");
+			Contract.Requires(zip != null);
 
 			int n = zip.Length;
 			a = new A[n];
@@ -176,7 +177,7 @@ namespace Metaphor.Collections
 
 		public static A[] MapFst(Tuple<A, B>[] zip)
 		{
-			if (zip == null) throw new ArgumentNullException("zip");
+			Contract.Requires(zip != null);
 
 			int n = zip.Length;
 			A[] a = new A[n];
@@ -187,7 +188,7 @@ namespace Metaphor.Collections
 
 		public static B[] MapSnd(Tuple<A, B>[] zip)
 		{
-			if (zip == null) throw new ArgumentNullException("zip");
+			Contract.Requires(zip != null);
 
 			int n = zip.Length;
 			B[] b = new B[n];

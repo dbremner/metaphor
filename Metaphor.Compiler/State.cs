@@ -15,6 +15,7 @@ using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using Metaphor.Collections;
 
@@ -52,7 +53,7 @@ namespace Metaphor.Compiler
 		#region Namespace scoping
 		public bool NamespaceStartsWith(string prefix)
 		{
-			if (prefix == null) throw new ArgumentNullException("prefix");
+			Contract.Requires(prefix != null);
 
 			foreach (MTypeBuilder type in typeBuilders)
 				if (type.ns != null && (type.ns == prefix || type.ns.StartsWith(prefix + ".")))

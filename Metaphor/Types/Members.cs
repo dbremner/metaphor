@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -214,12 +215,12 @@ namespace Metaphor
 
 		protected MetaphorMethod(MType declaringType, MethodInfo methodInfo, MType retType, ParamType[] paramTypes)
 		{
+			Contract.Requires(methodInfo != null);
+			Contract.Requires(retType != null);
+			Contract.Requires(paramTypes != null);
 			this.declaringType = declaringType;
-			if (methodInfo == null) throw new ArgumentNullException("methodInfo");
 			this.methodInfo = methodInfo;
-			if (retType == null) throw new ArgumentNullException("retType");
 			this.retType = retType;
-			if (paramTypes == null) throw new ArgumentNullException("paramTypes");
 			this.paramTypes = paramTypes;
 		}
 

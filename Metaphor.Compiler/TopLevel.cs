@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -28,8 +29,8 @@ namespace Metaphor.Compiler
         public Module(List<Ident> usings, Namespace defaultNamespace)
 			: base(null)
 		{
+			Contract.Requires(defaultNamespace != null);
 			this.usings = usings != null ? Ident.ToString(usings) : new List<string>();
-			if (defaultNamespace == null) throw new ArgumentNullException("defaultNamespace");
             this.defaultNamespace = defaultNamespace;
 		}
 

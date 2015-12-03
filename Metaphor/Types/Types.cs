@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
@@ -197,7 +198,8 @@ namespace Metaphor
 
 		protected internal virtual void GetMethods(List<MMethodInfo> methods, MType[] typeParams)
 		{
-			MType superType = GetSuperType();
+		    Contract.Ensure(Contract.Result<Metaphor.MType>() != null);
+            MType superType = GetSuperType();
 			if (superType != null) superType.GetMethods(methods, typeParams);
 		}
 

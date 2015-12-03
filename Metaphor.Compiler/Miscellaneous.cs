@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -289,12 +290,18 @@ namespace Metaphor.Compiler
 		public Ident(IToken token, string name)
 			: base(token)
 		{
-			if (name == null) throw new ArgumentNullException("name");
+            Contract.Requires(name != null);
 
 			this.name = name;
 		}
 
-		public string Name
+	    [ContractInvariantMethod]
+	    private void ObjectInvariant()
+	    {
+	        Contract.Invariant(name != null);
+	    }
+
+	    public string Name
 		{
 			get { return name; }
 		}

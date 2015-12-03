@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Metaphor.Collections;
 using M = Metaphor;
 
@@ -27,11 +28,11 @@ namespace Metaphor.Compiler
 		public Assignment(Expr lhs, Expr rhs, AssignOp op)
 			: base(lhs.Token)
 		{
-            if (lhs == null) throw new ArgumentNullException("lhs");
+            Contract.Requires(lhs != null);
+            Contract.Requires(rhs != null);
+			Contract.Requires(Enum.IsDefined(typeof (AssignOp), op));
 			this.lhs = lhs;
-            if (rhs == null) throw new ArgumentNullException("rhs");
 			this.rhs = rhs;
-			if (!Enum.IsDefined(typeof(AssignOp), op)) throw new ArgumentException("op");
 			this.op = op;
 		}
 

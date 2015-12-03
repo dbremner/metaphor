@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
@@ -212,7 +213,7 @@ namespace Metaphor
 
 		public static MType Subst(MType[] classTypeArgs, MType[] methodTypeArgs, Type systemType)
 		{
-			if (systemType == null) throw new ArgumentNullException("type");
+			Contract.Requires(systemType != null);
 			if (systemType.IsGenericTypeDefinition) throw new ArgumentException("IsGenericTypeDefinition", "type");
 
 			if (systemType.IsGenericParameter)
@@ -364,7 +365,7 @@ namespace Metaphor
 
 			protected Method(MethodInfo systemMethod)
 			{
-				if (systemMethod == null) throw new ArgumentNullException("systemMethod");
+				Contract.Requires(systemMethod != null);
 				if (systemMethod.IsGenericMethodDefinition) throw new ArgumentException("IsGenericMethodDefinition", "systemMethod");
 				this.systemMethod = systemMethod;
 			}
@@ -420,10 +421,10 @@ namespace Metaphor
 
 			protected GenericMethod(MethodInfo genericSystemMethod, MType[] typeArgs)
 			{
-				if (genericSystemMethod == null) throw new ArgumentNullException("genericSystemMethod");
+				Contract.Requires(genericSystemMethod != null);
+				Contract.Requires(typeArgs != null);
 				//if (!genericSystemMethod.IsGenericMethodDefinition) throw new ArgumentException("!IsGenericMethodDefinition", "genericSystemMethod");
 				this.genericSystemMethod = genericSystemMethod;
-				if (typeArgs == null) throw new ArgumentNullException("typeArgs");
 				if (typeArgs.Length != genericSystemMethod.GetGenericArguments().Length) throw new ArgumentException(string.Format("genericSystemMethod has {0} type parameter(s) but {1} type(s) was supplied in typeArgs", genericSystemMethod.GetGenericArguments().Length, typeArgs.Length));
 				this.typeArgs = typeArgs;
 			}
@@ -669,9 +670,9 @@ namespace Metaphor
 
 			protected Field(GenericSystemType declaringType, FieldInfo systemField)
 			{
-				if (declaringType == null) throw new ArgumentNullException("declaringType");
+				Contract.Requires(declaringType != null);
+				Contract.Requires(systemField != null);
 				this.declaringType = declaringType;
-				if (systemField == null) throw new ArgumentNullException("systemField");
 				this.systemField = systemField;
 			}
 
@@ -757,9 +758,9 @@ namespace Metaphor
 
 			protected Method(GenericSystemType declaringType, MethodInfo systemMethod)
 			{
-				if (declaringType == null) throw new ArgumentNullException("declaringType");
+				Contract.Requires(declaringType != null);
+				Contract.Requires(systemMethod != null);
 				this.declaringType = declaringType;
-				if (systemMethod == null) throw new ArgumentNullException("systemMethod");
 				if (systemMethod.IsGenericMethodDefinition) throw new ArgumentException("IsGenericMethodDefinition", "systemMethod");
 				this.systemMethod = systemMethod;
 			}
@@ -848,12 +849,12 @@ namespace Metaphor
 
 			protected GenericMethod(GenericSystemType declaringType, MethodInfo genericSystemMethod, MType[] typeArgs)
 			{
-				if (declaringType == null) throw new ArgumentNullException("declaringType");
+				Contract.Requires(declaringType != null);
+				Contract.Requires(genericSystemMethod != null);
+				Contract.Requires(typeArgs != null);
 				this.declaringType = declaringType;
-				if (genericSystemMethod == null) throw new ArgumentNullException("genericSystemMethod");
 				if (!genericSystemMethod.IsGenericMethodDefinition) throw new ArgumentException("!IsGenericMethodDefinition", "genericSystemMethod");
 				this.genericSystemMethod = genericSystemMethod;
-				if (typeArgs == null) throw new ArgumentNullException("typeArgs");
 				if (typeArgs.Length != genericSystemMethod.GetGenericArguments().Length) throw new ArgumentException(string.Format("genericSystemMethod has {0} type parameter(s) but {1} type(s) was supplied in typeArgs", genericSystemMethod.GetGenericArguments().Length, typeArgs.Length));
 				this.typeArgs = typeArgs;
 			}

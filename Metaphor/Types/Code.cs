@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -26,7 +27,7 @@ namespace Metaphor
 
 		public CodeType(MType codeType, bool @ref)
 		{
-			if (codeType == null) throw new ArgumentNullException("codeType");
+			Contract.Requires(codeType != null);
 			if (@ref && codeType == PrimType.Void) throw new ArgumentException("Cannot create the type <|ref void|>.");
 			this.codeType = codeType;
 			this.@ref = @ref;
@@ -234,8 +235,8 @@ namespace Metaphor
 
 		public static FixedArrayType Create(MType elemType)
 		{
-			if (elemType == null) throw new ArgumentNullException("elemType");
-			return new FixedArrayType(elemType);
+		    Contract.Requires(elemType != null);
+		    return new FixedArrayType(elemType);
 		}
 
 		public override string GetName()
