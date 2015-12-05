@@ -353,7 +353,7 @@ namespace Metaphor
 			else module.CreateGlobalFunctions();
 		}
 
-		private void MakeClosureClass(TypeBuilder declaringScope, string name, List<ClosureType> typeVars, List<Closure> vars, out TypeBuilder typeBuilder, out ConstructorInfo ctor)
+		private static void MakeClosureClass(TypeBuilder declaringScope, string name, List<ClosureType> typeVars, List<Closure> vars, out TypeBuilder typeBuilder, out ConstructorInfo ctor)
 		{
 			typeBuilder = declaringScope.DefineNestedType(
 				name,

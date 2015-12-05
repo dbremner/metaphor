@@ -648,7 +648,7 @@ namespace Metaphor.Compiler
 			return new M.TypeIf(typeVar.decl, decls, Patternify(decls, mType), mIfTrue, mIfFalse);
 		}
 
-		private MType Patternify(TypeVarDecl[] decls, MType type)
+		private static MType Patternify(TypeVarDecl[] decls, MType type)
 		{
 			TypeVar typeVar = type as TypeVar;
 			if (typeVar != null && Array.IndexOf<TypeVarDecl>(decls, typeVar.decl) != -1) return new PatternVar((LocalReflTypeVarDecl) typeVar.decl);

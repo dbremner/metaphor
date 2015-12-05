@@ -436,7 +436,7 @@ namespace Metaphor.Compiler
 			return result;
 		}
 
-		private MType SubstType(MType type, TypeVarDecl src, MType dest)
+		private static MType SubstType(MType type, TypeVarDecl src, MType dest)
 		{
 			TypeVar typeVar = type as TypeVar;
 			if (typeVar != null)

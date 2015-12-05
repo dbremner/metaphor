@@ -197,14 +197,14 @@ namespace Metaphor.Compiler
 		public const int DOUBLE_SUFFIX = 169;
 		public const int DECIMAL_SUFFIX = 170;
 		public const int SINGLE_CHARACTER = 171;
-		
-		
-	void NotDone(IToken token, string msg)
+
+
+	static void NotDone(IToken token, string msg)
 	{
 		throw new SemanticException(msg, token.getFilename(), token.getLine(), token.getColumn());
 	}
-	
-	T ListReverse<T>(T list) where T : class, System.Collections.IList
+
+	static T ListReverse<T>(T list) where T : class, System.Collections.IList
 	{
 		if(list != null)
 		{
