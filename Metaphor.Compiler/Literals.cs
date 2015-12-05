@@ -21,7 +21,7 @@ namespace Metaphor.Compiler
 {
 	public abstract class Literal : Expr
 	{
-		public Literal(IToken token)
+	    protected Literal(IToken token)
 			: base(token)
 		{
 		}

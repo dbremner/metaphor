@@ -22,7 +22,7 @@ namespace Metaphor.Compiler
 {
 	public abstract class Stmt : Node
 	{
-		public Stmt(IToken token)
+	    protected Stmt(IToken token)
 			: base(token)
 		{
 		}

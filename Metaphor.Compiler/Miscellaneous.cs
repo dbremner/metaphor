@@ -260,7 +260,7 @@ namespace Metaphor.Compiler
 	{
 		private IToken token;
 
-		public Node(IToken token)
+	    protected Node(IToken token)
 		{
 			this.token = token;
 		}

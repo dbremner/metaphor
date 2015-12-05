@@ -24,7 +24,7 @@ namespace Metaphor
 	{
         private MType type;
 
-		public Value(MType type)
+	    protected Value(MType type)
 		{
             this.type = type;
 		}

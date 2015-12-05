@@ -26,7 +26,7 @@ namespace Metaphor
 		public int sym;
 		public MTypeBuilder declaringType;
 
-		public MemberBuilder(int sym)
+	    protected MemberBuilder(int sym)
 		{
 			this.sym = sym == -1 ? genSym++ : sym;
 			// declaringType is set in the method MTypeBuilder::Add when the member is added to a type

@@ -23,7 +23,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract class MMemberInfo
 	{
-		public MMemberInfo()
+	    protected MMemberInfo()
 		{
 		}
 
@@ -42,7 +42,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract partial class MFieldInfo : MMemberInfo
 	{
-		public MFieldInfo(): base()
+	    protected MFieldInfo(): base()
 		{
 		}
 
@@ -93,7 +93,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract class MMethodBase : MMemberInfo
 	{
-		public MMethodBase(): base()
+	    protected MMethodBase(): base()
 		{
 		}
 
@@ -130,7 +130,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract partial class MMethodInfo : MMethodBase
 	{
-		public MMethodInfo(): base()
+	    protected MMethodInfo(): base()
 		{
 		}
 
@@ -264,7 +264,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract partial class MConstructorInfo : MMethodBase
 	{
-		public MConstructorInfo(): base()
+	    protected MConstructorInfo(): base()
 		{
 		}
 

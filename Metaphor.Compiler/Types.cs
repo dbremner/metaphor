@@ -24,7 +24,7 @@ namespace Metaphor.Compiler
 	{
 		public MType mType;
 
-		public Typ(IToken token)
+	    protected Typ(IToken token)
 			: base(token)
 		{
 		}

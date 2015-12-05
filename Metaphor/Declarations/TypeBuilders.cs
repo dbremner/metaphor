@@ -38,7 +38,7 @@ namespace Metaphor
 		[NonSerialized]
 		public TypeBuilder typeBuilder;
 
-		public MTypeBuilder(int sym, string name, string ns, TypeAttributes attr, TypeVarDecl[] @params)
+	    protected MTypeBuilder(int sym, string name, string ns, TypeAttributes attr, TypeVarDecl[] @params)
 		{
 			this.sym = sym == -1 ? genSym++ : sym;
 			this.name = name;

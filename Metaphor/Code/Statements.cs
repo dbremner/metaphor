@@ -22,7 +22,7 @@ namespace Metaphor
 {
 	public abstract class Stmt: Code
 	{
-		public Stmt()
+	    protected Stmt()
 		{
 		}
 

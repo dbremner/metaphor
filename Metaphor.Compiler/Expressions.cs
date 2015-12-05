@@ -24,7 +24,7 @@ namespace Metaphor.Compiler
 	{
 		//public M.Code mExpr;
 
-		public Expr(IToken token)
+	    protected Expr(IToken token)
 			: base(token)
 		{
 		}
@@ -532,7 +532,7 @@ namespace Metaphor.Compiler
 		public AssignOp op;
 		public AssignRet ret;
 
-		public Increment(Expr expr, AssignOp op, AssignRet ret)
+	    protected Increment(Expr expr, AssignOp op, AssignRet ret)
 			: base(expr.Token)
 		{
 			Contract.Requires(expr != null);
@@ -578,7 +578,7 @@ namespace Metaphor.Compiler
 		public UnaryOpCode op;
 		public Expr a;
 
-		public UnaryOp(IToken token, Expr x)
+	    protected UnaryOp(IToken token, Expr x)
 			: base(token)
 		{
 		    Contract.Requires(x != null);
@@ -719,7 +719,7 @@ namespace Metaphor.Compiler
 		protected string name;
 		public Expr a, b;
 
-		public BinaryOp(string name, Expr x, Expr y)
+	    protected BinaryOp(string name, Expr x, Expr y)
 			: base(x.Token)
 		{
 			Contract.Requires(x != null);

@@ -23,7 +23,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract partial class Code
 	{
-		public Code()
+	    protected Code()
 		{
 		}
 

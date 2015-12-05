@@ -557,7 +557,7 @@ namespace Metaphor.Compiler
 
 		public abstract class Frame
 		{
-			public Frame()
+		    protected Frame()
 			{
 			}
 

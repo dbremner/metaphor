@@ -25,7 +25,7 @@ namespace Metaphor.Compiler
 		public Modifier mods;
 		public string name;
 
-		public Member(IToken token, Modifier mods, Ident name)
+	    protected Member(IToken token, Modifier mods, Ident name)
 			: base(token)
 		{
 			Contract.Requires(name != null);

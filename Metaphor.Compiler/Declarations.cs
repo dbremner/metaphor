@@ -27,7 +27,7 @@ namespace Metaphor.Compiler
 
 		internal MTypeBuilder mTypeBuilder;
 
-		public TypeDecl(IToken token, Modifier mods, Ident name)
+	    protected TypeDecl(IToken token, Modifier mods, Ident name)
 			: base(token)
 		{
 			Contract.Requires(name != null);
@@ -122,7 +122,7 @@ namespace Metaphor.Compiler
 
 	public abstract class TypeParamCon : Node
 	{
-		public TypeParamCon(IToken token)
+	    protected TypeParamCon(IToken token)
 			: base(token)
 		{
 		}

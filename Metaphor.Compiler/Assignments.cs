@@ -25,7 +25,7 @@ namespace Metaphor.Compiler
 		public Expr rhs;
 		public AssignOp op;
 
-		public Assignment(Expr lhs, Expr rhs, AssignOp op)
+	    protected Assignment(Expr lhs, Expr rhs, AssignOp op)
 			: base(lhs.Token)
 		{
             Contract.Requires(lhs != null);
