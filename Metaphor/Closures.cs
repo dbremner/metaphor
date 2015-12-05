@@ -19,10 +19,10 @@ namespace Metaphor
 {
 	public class VirtualTuple
 	{
-		private int size;
-		private Type type;
-		private ConstructorInfo ctor;
-		private FieldInfo[] fields;
+		private readonly int size;
+		private readonly Type type;
+		private readonly ConstructorInfo ctor;
+		private readonly FieldInfo[] fields;
 
 		public VirtualTuple(Type[] types)
 		{

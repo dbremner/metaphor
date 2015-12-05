@@ -285,7 +285,7 @@ namespace Metaphor.Compiler
 
 	public sealed class Ident : Node
 	{
-		private string name;
+		private readonly string name;
 
 		public Ident(IToken token, string name)
 			: base(token)

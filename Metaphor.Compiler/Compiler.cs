@@ -24,7 +24,7 @@ namespace Metaphor.Compiler
 {
 	public class Compiler
 	{
-		private Assembly[] externs;
+		private readonly Assembly[] externs;
 
 		public Compiler()
 		{

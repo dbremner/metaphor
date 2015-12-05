@@ -109,17 +109,17 @@ namespace Metaphor
 	{
 		private int count = 0;
 
-		public AssemblyBuilder assembly;
-		public ModuleBuilder module;
-		public Stack<TypeBuilder> types;
+		public readonly AssemblyBuilder assembly;
+		public readonly ModuleBuilder module;
+		public readonly Stack<TypeBuilder> types;
 		public MethodBuilder entryPoint;
 
-		private GroupDictionary<int, TypeVarDecl> typeVars;
+		private readonly GroupDictionary<int, TypeVarDecl> typeVars;
 
-		public Set<object> cspStore;
+		public readonly Set<object> cspStore;
 		private TypeBuilder cspStoreType;
 		private Dictionary<object, FieldInfo> cspFields;
-		private List<TypeBuilder> closures;
+		private readonly List<TypeBuilder> closures;
 
 		private TypeBuilder functions;
 
@@ -407,25 +407,25 @@ namespace Metaphor
 		protected int level = 0;
 
 		// local variables and method/function parameters that are in scope
-		protected GroupStack<VarDecl> vars = new GroupStack<VarDecl>();
+		protected readonly GroupStack<VarDecl> vars = new GroupStack<VarDecl>();
 
 		// the function definition that are may be in scope
 		protected Function func = null;
 
 		// closure varibles used by the current function
-		protected List<Closure> closures = new List<Closure>();
-		protected Dictionary<int, ClosureTypeVarDecl> closureTypes = new Dictionary<int, ClosureTypeVarDecl>();
+		protected readonly List<Closure> closures = new List<Closure>();
+		protected readonly Dictionary<int, ClosureTypeVarDecl> closureTypes = new Dictionary<int, ClosureTypeVarDecl>();
 
-		protected GroupStack<TypeVarDecl> typeVars = new GroupStack<TypeVarDecl>();
+		protected readonly GroupStack<TypeVarDecl> typeVars = new GroupStack<TypeVarDecl>();
 		
 		// store for all CSP objects used in the current code generation
 		// only the top level function/method has this
-		protected Set<object> rootCspStore;
+		protected readonly Set<object> rootCspStore;
 		protected bool hasCsp;
 
-		protected List<Function> functions;
+		protected readonly List<Function> functions;
 
-		protected TypeCheckState outer;
+		protected readonly TypeCheckState outer;
 
 		public TypeCheckState(Set<object> rootCspStore, TypeCheckState outer)
 		{
@@ -538,7 +538,7 @@ namespace Metaphor
 		#endregion
 
 		#region Member Management
-		private Stack<ForField> fields = new Stack<ForField>();
+		private readonly Stack<ForField> fields = new Stack<ForField>();
 
 		public void PushField(ForField decl)
 		{
@@ -1103,7 +1103,7 @@ namespace Metaphor
 
 	internal sealed class ModuleCodeGenState : CodeGenState
 	{
-		private ModuleGenState module;
+		private readonly ModuleGenState module;
 
 
 		public ModuleCodeGenState(ModuleGenState module, ILGenerator code)
@@ -1182,7 +1182,7 @@ namespace Metaphor
 	{
 		private static int id = 0;
 
-		private Module module;
+		private readonly Module module;
 
 		public Set<object> cspObjects;
 		private VirtualTuple cspStoreType;
@@ -1298,8 +1298,8 @@ namespace Metaphor
 
 	internal sealed class DynamicMethodCodeGenState : CodeGenState
 	{
-		private DynamicMethodGenState module;
-		private Location cspStore;
+		private readonly DynamicMethodGenState module;
+		private readonly Location cspStore;
 		public DynamicMethod dm;
 
 		public DynamicMethodCodeGenState(DynamicMethodGenState module, Location cspStore, DynamicMethod dm)
@@ -1401,7 +1401,7 @@ namespace Metaphor
 
 	internal sealed class GenericParamType : LocationType
 	{
-		private GenericTypeParameterBuilder genericParam;
+		private readonly GenericTypeParameterBuilder genericParam;
 
 		public GenericParamType(GenericTypeParameterBuilder genericParam)
 		{
@@ -1416,10 +1416,10 @@ namespace Metaphor
 
 	internal sealed class Closure
 	{
-		public object decl;
-		public MType type;
-		public Location outside;
-		public DeferredLoc inside;
+		public readonly object decl;
+		public readonly MType type;
+		public readonly Location outside;
+		public readonly DeferredLoc inside;
 
 		public Closure(object decl, MType type, Location outside)
 		{
@@ -1525,8 +1525,8 @@ namespace Metaphor
 
 	internal sealed class ParamLoc : Location
 	{
-		private int pos;
-		private Type type;
+		private readonly int pos;
+		private readonly Type type;
 
 		public ParamLoc(int pos, Type type)
 		{
@@ -1569,9 +1569,10 @@ namespace Metaphor
 
 	internal class AddrLoc : Location
 	{
-		private Location loc;
-		private OpCode ldInstr, stInstr;
-		private Type type;
+		private readonly Location loc;
+		private readonly OpCode ldInstr;
+	    private readonly OpCode stInstr;
+	    private readonly Type type;
 
 		public AddrLoc(Location loc)
 		{
@@ -1676,8 +1677,8 @@ namespace Metaphor
 
 	internal class LocalLoc : Location
 	{
-		private int pos;
-		private Type type;
+		private readonly int pos;
+		private readonly Type type;
 
 		public LocalLoc(int pos, Type type)
 		{
@@ -1724,8 +1725,8 @@ namespace Metaphor
 
 	internal class FieldLoc : Location
 	{
-		private Location loc;
-		private FieldInfo field;
+		private readonly Location loc;
+		private readonly FieldInfo field;
 
 		public FieldLoc(Location loc, FieldInfo field)
 		{
@@ -1758,10 +1759,10 @@ namespace Metaphor
 
 	internal class ArrayLoc : Location
 	{
-		private Location loc;
-		private OpCode instr;
-		private Type type;
-		private int index;
+		private readonly Location loc;
+		private readonly OpCode instr;
+		private readonly Type type;
+		private readonly int index;
 
 		public ArrayLoc(Location loc, Type type, int index)
 		{
@@ -1839,9 +1840,9 @@ namespace Metaphor
 
 	internal class GlobalLoc : Location
 	{
-		private static SortedDictionary<FieldInfo, GlobalLoc> globalLocs = new SortedDictionary<FieldInfo, GlobalLoc>();
+		private static readonly SortedDictionary<FieldInfo, GlobalLoc> globalLocs = new SortedDictionary<FieldInfo, GlobalLoc>();
 
-		private FieldInfo field;
+		private readonly FieldInfo field;
 
 		private GlobalLoc(FieldInfo field)
 		{
@@ -1882,10 +1883,10 @@ namespace Metaphor
 
 	internal class FunctionLoc : Location
 	{
-		private ConstructorInfo delegateCtor;
-		private ConstructorInfo closureCtor;
-		private MethodInfo invokeMethod;
-		private List<Location> closures;
+		private readonly ConstructorInfo delegateCtor;
+		private readonly ConstructorInfo closureCtor;
+		private readonly MethodInfo invokeMethod;
+		private readonly List<Location> closures;
 
 		public FunctionLoc(ConstructorInfo delegateCtor, ConstructorInfo closureCtor, MethodInfo invokeMethod, List<Location> closures)
 		{

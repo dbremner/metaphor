@@ -20,11 +20,10 @@ namespace Metaphor.Collections
 	[Serializable]
 	public class Set<T>: ICollection<T>, IEnumerable<T>
 	{
-		private Dictionary<T,object> map;
+		private readonly Dictionary<T,object> map = new Dictionary<T,object>();
 
 		public Set()
 		{
-			this.map = new Dictionary<T,object>();
 		}
 
 		public void Add(T element)
@@ -344,9 +343,9 @@ namespace Metaphor.Collections
 	[Serializable]
 	public struct Either<A, B>
 	{
-		private bool which;
-		private A left;
-		private B right;
+		private readonly bool which;
+		private readonly A left;
+		private readonly B right;
 
 		public Either(A left)
 		{

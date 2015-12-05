@@ -475,7 +475,7 @@ namespace Metaphor
 	{
 		// the type variable is captured from an outer scope and is accessed from a closure environment
 		[NonSerialized]
-		internal TypeVarDecl decl;
+		internal readonly TypeVarDecl decl;
 
 		[NonSerialized]
 		internal GenericTypeParameterBuilder genericParam;
@@ -520,7 +520,7 @@ namespace Metaphor
 
 	public class GenericTypeVarDecl : TypeVarDecl
 	{
-		internal bool onMethod;
+		internal readonly bool onMethod;
 
 		// if the type variable has levelKind == 0 then it is represent as a generic type parameter
 		[NonSerialized]

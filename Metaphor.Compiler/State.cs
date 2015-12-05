@@ -27,8 +27,8 @@ namespace Metaphor.Compiler
 	{
 		public int level; 
 		
-		private List<Assembly> externs;
-		private Set<string> externNamespaces;
+		private readonly List<Assembly> externs;
+		private readonly Set<string> externNamespaces;
 		public M.MModuleBuilder module;
 
 		public CompileState(Assembly[] externs)
@@ -96,7 +96,7 @@ namespace Metaphor.Compiler
 		#endregion
 
 		#region Type scoping
-		private Stack<MType> classes = new Stack<MType>();
+		private readonly Stack<MType> classes = new Stack<MType>();
 
 		public MType GetCurrentClass()
 		{
@@ -354,7 +354,7 @@ namespace Metaphor.Compiler
 			return null;
 		}
 
-		private Stack<MType> expectedType = new Stack<MType>();
+		private readonly Stack<MType> expectedType = new Stack<MType>();
 		public void PushExpectedType(MType type)
 		{
 			expectedType.Push(type);

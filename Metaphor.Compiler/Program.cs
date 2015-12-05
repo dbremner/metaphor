@@ -24,7 +24,7 @@ namespace Metaphor.Compiler
 	{
 		static string inputFile;
 		static string outputFile;
-		static List<string> references = new List<string>();
+		static readonly List<string> references = new List<string>();
 		static Action action = Action.None;
 
 		static void Main(string[] args)

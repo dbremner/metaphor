@@ -769,7 +769,7 @@ namespace Metaphor.Compiler
 	#region Arithmetic ops
 	public abstract class NumericOp : BinaryOp
 	{
-		private BinaryArithmeticOpCode op;
+		private readonly BinaryArithmeticOpCode op;
 
 		public NumericOp(BinaryArithmeticOpCode op, string name, Expr x, Expr y)
 			: base(name, x, y)
@@ -849,7 +849,7 @@ namespace Metaphor.Compiler
 	#region Relational ops
 	public abstract class RelationalOp : BinaryOp
 	{
-		private BinaryRelationalOpCode op;
+		private readonly BinaryRelationalOpCode op;
 
 		public RelationalOp(BinaryRelationalOpCode op, string name, Expr x, Expr y)
 			: base(name, x, y)
@@ -938,7 +938,7 @@ namespace Metaphor.Compiler
 	#region Equality ops
 	public abstract class EqualityOp : BinaryOp
 	{
-		private BinaryEqualityOpCode op;
+		private readonly BinaryEqualityOpCode op;
 
 		public EqualityOp(BinaryEqualityOpCode op, string name, Expr x, Expr y)
 			: base(name, x, y)
@@ -1002,7 +1002,7 @@ namespace Metaphor.Compiler
 	#region Logical ops
 	public abstract class LogicalOp : BinaryOp
 	{
-		private BinaryLogicalOpCode op;
+		private readonly BinaryLogicalOpCode op;
 
 		public LogicalOp(BinaryLogicalOpCode op, string name, Expr x, Expr y)
 			: base(name, x, y)

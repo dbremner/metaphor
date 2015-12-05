@@ -475,7 +475,7 @@ namespace Metaphor
 		[Serializable]
 		public class ObjRef : IObjectReference
 		{
-			private Type systemType;
+			private readonly Type systemType;
 
 			protected ObjRef(SerializationInfo info, StreamingContext context)
 			{

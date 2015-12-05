@@ -176,7 +176,7 @@ namespace Metaphor
 
 		public abstract class SaveOrIldasmMethod : MetaphorMethod
 		{
-			private static ParamType[] saveParamTypes = new ParamType[] { ParamType.Create(PrimType.String, false) };
+			private static readonly ParamType[] saveParamTypes = new ParamType[] { ParamType.Create(PrimType.String, false) };
 
 			protected SaveOrIldasmMethod(CodeType codeType, MethodInfo methodInfo): base(codeType, methodInfo, PrimType.Void, saveParamTypes)
 			{

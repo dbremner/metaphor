@@ -22,7 +22,7 @@ namespace Metaphor
 	[Serializable]
 	public abstract class Value: Code
 	{
-        private MType type;
+        private readonly MType type;
 
 	    protected Value(MType type)
 		{

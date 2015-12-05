@@ -955,7 +955,7 @@ namespace Metaphor
 
 	public class FixedArray : Code
 	{
-		private FixedArrayCreate fixedArray;
+		private readonly FixedArrayCreate fixedArray;
 
 		public static Code Create(int length, Code array, FixedArrayCont k)
 		{
@@ -1203,7 +1203,7 @@ namespace Metaphor
 
 	public partial class DelegateCreate : Code
 	{
-        MType delegateType;
+	    readonly MType delegateType;
 		public Code expr;
 		public MMethodInfo method;
 

@@ -407,7 +407,7 @@ namespace Metaphor
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple=false)]
 	public sealed class CodeTypeAttribute : Attribute
 	{
-		private Type codeType;
+		private readonly Type codeType;
 		internal static ConstructorInfo ctor;
 
 		static CodeTypeAttribute()

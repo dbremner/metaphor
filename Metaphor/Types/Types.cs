@@ -909,7 +909,7 @@ namespace Metaphor
 
 	public class LiftType : MType
 	{
-		internal MType type;
+		internal readonly MType type;
 
 		public LiftType(MType type)
 		{
