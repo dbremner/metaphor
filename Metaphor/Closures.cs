@@ -71,7 +71,7 @@ namespace Metaphor
 		{
 			if (size == 1 && args.Length == 1) return args[0];
 			else if (size == args.Length) return type.GetConstructor(new Type[] { typeof(object[]) }).Invoke(new object[] { args });
-			else throw new ArgumentException(string.Format("Expecting {0} objects; got {1}.", size, args.Length));
+			else throw new ArgumentException($"Expecting {size} objects; got {args.Length}.");
 		}
 	}
 }

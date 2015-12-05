@@ -1104,7 +1104,7 @@ namespace Metaphor.Compiler
 
 				if (typeArgs == null)
 				{
-					ns = string.Format("{0}.{1}", ns, name);
+					ns = $"{ns}.{name}";
 					if (state.NamespaceStartsWith(ns)) return new Namespace(ns);
 					throw state.ThrowTypeError(this, "The namespace '{0}' could not be found.", ns);
 				}

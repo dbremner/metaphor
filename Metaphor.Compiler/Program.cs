@@ -66,7 +66,7 @@ namespace Metaphor.Compiler
 					else if (arg.StartsWith("/r:")) references.Add(arg.Substring(3));
 					else if (arg == "/run") action = Action.Run;
 					else if (arg == "/save") action = Action.Save;
-					else throw new Exception(string.Format("Unknown argument: {0}", arg));
+					else throw new Exception($"Unknown argument: {arg}");
 				}
 				else if (inputFile == null) inputFile = arg;
 				else throw new Exception("Can only specify one input file.");

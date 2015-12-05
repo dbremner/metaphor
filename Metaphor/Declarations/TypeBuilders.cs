@@ -116,8 +116,8 @@ namespace Metaphor
 		{
 			if (state.types.Count == 0)
 			{
-				string fullName = ns != null ? string.Format("{0}.{1}", ns, name) : name;
-				if (@params.Length > 0) fullName = string.Format("{0}`{1}", fullName, @params.Length);
+				string fullName = ns != null ? $"{ns}.{name}" : name;
+				if (@params.Length > 0) fullName = $"{fullName}`{@params.Length}";
 				typeBuilder = state.module.DefineType(fullName, attr);
 			}
 			else
@@ -327,7 +327,8 @@ namespace Metaphor
 
 			public static MType Create(MTypeBuilder type, MType[] args)
 			{
-				if (type.@params.Length != args.Length) throw new ArgumentException(string.Format("'type' has {0} type parameter(s) but {1} type(s) was supplied in 'args'", type.@params.Length, args.Length));
+				if (type.@params.Length != args.Length) throw new ArgumentException(
+				    $"'type' has {type.@params.Length} type parameter(s) but {args.Length} type(s) was supplied in 'args'");
 
 				int levelKind = 0;
 				for (int i = 0; i < args.Length; i++)

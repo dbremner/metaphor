@@ -35,7 +35,7 @@ namespace Metaphor
 
 		public override string ToString()
 		{
-			return string.Format("{0}::{1}", GetDeclaringType(), GetName());
+			return $"{GetDeclaringType()}::{GetName()}";
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace Metaphor
 
 		public override string  ToString()
 		{
-			return string.Format("{0} {1}::{2}", GetFieldType(), GetDeclaringType(), GetName());
+			return $"{GetFieldType()} {GetDeclaringType()}::{GetName()}";
  		}
 	}
 

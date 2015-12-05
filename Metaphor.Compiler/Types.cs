@@ -144,7 +144,7 @@ namespace Metaphor.Compiler
             Contract.Requires(name != null);
             this.parent = parent;
 			this.name = name.Name;
-			this.args = CheckNull<Typ>(args);
+			this.args = CheckNull(args);
 		}
 
 	    [ContractInvariantMethod]
@@ -166,7 +166,7 @@ namespace Metaphor.Compiler
 					string ns = parent.CompileNamespace(state);
 					if (ns != null)
 					{
-						ns = string.Format("{0}.{1}", ns, name);
+						ns = $"{ns}.{name}";
 						if (state.NamespaceStartsWith(ns)) return ns;
 					}
 				}

@@ -73,7 +73,7 @@ namespace Metaphor.Compiler
 		{
 			if(namespaces.Count == 0) namespaces.Push(@namespace);
 			else
-				namespaces.Push(string.Format("{0}.{1}", namespaces.Peek(), @namespace));
+				namespaces.Push($"{namespaces.Peek()}.{@namespace}");
 		}
 
 		public void PopNamespace()
@@ -238,9 +238,9 @@ namespace Metaphor.Compiler
 		public System.Type LookupSystemType(string ns, string name, int arity)
 		{
 			string fullName = string.Format("{0}{1}{2}",
-				ns != null ? string.Format("{0}.", ns): string.Empty,
+				ns != null ? $"{ns}." : string.Empty,
 				name,
-				arity > 0 ? string.Format("`{0}", arity): string.Empty);
+				arity > 0 ? $"`{arity}" : string.Empty);
 			foreach (Assembly assembly in externs)
 			{
 				System.Type systemType = assembly.GetType(fullName);
@@ -607,7 +607,7 @@ namespace Metaphor.Compiler
 			public override string GetLocationString()
 			{
 				M.MMethodBuilder method = methodBase as M.MMethodBuilder;
-				if (method != null) return string.Format("In method '{0}':", method.name);
+				if (method != null) return $"In method '{method.name}':";
 
 				M.MConstructorBuilder ctor = methodBase as M.MConstructorBuilder;
 				if (ctor != null) return "In constructor:";

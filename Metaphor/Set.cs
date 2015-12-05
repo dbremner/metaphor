@@ -127,7 +127,7 @@ namespace Metaphor.Collections
 
 		public override string ToString()
 		{
-			return string.Format("({0}, {1})", fst, snd);
+			return $"({fst}, {snd})";
 		}
 
 		public static bool operator ==(Tuple<A, B> x, Tuple<A, B> y)
@@ -251,7 +251,7 @@ namespace Metaphor.Collections
 
 		public override string ToString()
 		{
-			return string.Format("({0}, {1}, {2})", fst, snd, trd);
+			return $"({fst}, {snd}, {trd})";
 		}
 
 		public static bool operator ==(Tuple<A, B, C> x, Tuple<A, B, C> y)
@@ -327,7 +327,7 @@ namespace Metaphor.Collections
 
 		public override string ToString()
 		{
-			return string.Format("({0}, {1}, {2}, {3})", fst, snd, trd, fth);
+			return $"({fst}, {snd}, {trd}, {fth})";
 		}
 
 		public static bool operator ==(Tuple<A, B, C, D> x, Tuple<A, B, C, D> y)
@@ -417,7 +417,7 @@ namespace Metaphor.Collections
 
 		public override string ToString()
 		{
-			if (!which) return string.Format("Left {0}", left);
+			if (!which) return $"Left {left}";
 			else return string.Format("Right {1}", right);
 		}
 
