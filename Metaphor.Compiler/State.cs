@@ -133,7 +133,7 @@ namespace Metaphor.Compiler
 			else throw new InvalidOperationException("Class stack is empty.");
 		}
 
-		private GroupStack<MTypeBuilder> typeBuilders = new GroupStack<MTypeBuilder>();
+		private readonly GroupStack<MTypeBuilder> typeBuilders = new GroupStack<MTypeBuilder>();
 
 		public void PushTypeBuilders(MTypeBuilder[] typeBuilders)
 		{
@@ -271,19 +271,19 @@ namespace Metaphor.Compiler
 		#endregion
 
 		#region Variable scoping
-		private Stack<Tuple<string, Code>> consts = new Stack<Tuple<string, Code>>();
-		private Stack<Tuple<VarDecl, int>> vars = new Stack<Tuple<VarDecl, int>>();
-		private Stack<Tuple<MType, int>> rets = new Stack<Tuple<MType, int>>();
-		private Stack<Tuple<int,int>> marks = new Stack<Tuple<int,int>>();
+		private readonly Stack<Collections.Tuple<string, Code>> consts = new Stack<Collections.Tuple<string, Code>>();
+		private readonly Stack<Collections.Tuple<VarDecl, int>> vars = new Stack<Collections.Tuple<VarDecl, int>>();
+		private readonly Stack<Collections.Tuple<MType, int>> rets = new Stack<Collections.Tuple<MType, int>>();
+		private readonly Stack<Collections.Tuple<int,int>> marks = new Stack<Collections.Tuple<int,int>>();
 
 		public void PushConst(string name, Code code)
 		{
-			consts.Push(new Tuple<string, Code>(name, code));
+			consts.Push(new Collections.Tuple<string, Code>(name, code));
 		}
 
 		public void PushLocal(VarDecl decl)
 		{
-			vars.Push(new Tuple<VarDecl, int>(decl, level));
+			vars.Push(new Collections.Tuple<VarDecl, int>(decl, level));
 		}
 
 		public void PushMethod(ThisDecl @this, ParamDecl[] @params, MType retType)
@@ -291,7 +291,7 @@ namespace Metaphor.Compiler
 			PushBlock();
 			if (@this != null) PushLocal(@this);
 			foreach (ParamDecl decl in @params) PushLocal(decl);
-			rets.Push(new Tuple<MType, int>(retType, level));
+			rets.Push(new Collections.Tuple<MType, int>(retType, level));
 		}
 
 		public void PopMethod()
@@ -302,24 +302,24 @@ namespace Metaphor.Compiler
 
 		public void PushBlock()
 		{
-			marks.Push(new Tuple<int,int>(consts.Count, vars.Count));
+			marks.Push(new Collections.Tuple<int,int>(consts.Count, vars.Count));
 		}
 
 		public void PopBlock()
 		{
-			Tuple<int, int> mark = marks.Pop();
+		    Collections.Tuple<int, int> mark = marks.Pop();
 			while (consts.Count > mark.fst) consts.Pop();
 			while (vars.Count > mark.snd) vars.Pop();
 		}
 
 		public Code LookupVar(string name)
 		{
-			foreach (Tuple<string, Code> @const in consts)
+			foreach (Collections.Tuple<string, Code> @const in consts)
 			{
 				if (@const.fst == name) return @const.snd;
 			}
 
-			foreach (Tuple<VarDecl, int> var in vars)
+			foreach (Collections.Tuple<VarDecl, int> var in vars)
 			{
 				if (var.fst.name == name)
 				{
@@ -347,7 +347,7 @@ namespace Metaphor.Compiler
 
 		public MType GetReturnType()
 		{
-			foreach (Tuple<MType, int> ret in rets)
+			foreach (Collections.Tuple<MType, int> ret in rets)
 			{
 				if (ret.snd == level) return SubstType(ret.fst);
 			}
@@ -375,14 +375,14 @@ namespace Metaphor.Compiler
 		#endregion
 
 		#region Type variable scoping
-		private GroupStack<Tuple<TypeVarDecl, int>> typeVars = new GroupStack<Tuple<TypeVarDecl, int>>();
-		private Stack<Tuple<TypeVarDecl, MType>> subst = new Stack<Tuple<TypeVarDecl, MType>>();
+		private readonly GroupStack<Collections.Tuple<TypeVarDecl, int>> typeVars = new GroupStack<Collections.Tuple<TypeVarDecl, int>>();
+		private readonly Stack<Collections.Tuple<TypeVarDecl, MType>> subst = new Stack<Collections.Tuple<TypeVarDecl, MType>>();
 
 		public void PushTypeVars(IEnumerable<TypeVarDecl> decls)
 		{
 			typeVars.Mark();
 			foreach (TypeVarDecl decl in decls)
-				typeVars.Push(new Tuple<TypeVarDecl, int>(decl, level));
+				typeVars.Push(new Collections.Tuple<TypeVarDecl, int>(decl, level));
 		}
 
 		public void PopTypeVar()
@@ -392,12 +392,12 @@ namespace Metaphor.Compiler
 
 		public void PushTypeVar(TypeVarDecl decl)
 		{
-			typeVars.PushAndMark(new Tuple<TypeVarDecl, int>(decl, level));
+			typeVars.PushAndMark(new Collections.Tuple<TypeVarDecl, int>(decl, level));
 		}
 
 		public MType LookupTypeVar(string name)
 		{
-			foreach (Tuple<TypeVarDecl, int> typeVarDecl in typeVars)
+			foreach (Collections.Tuple<TypeVarDecl, int> typeVarDecl in typeVars)
 				if (typeVarDecl.fst.name == name)
 				{
 					if (typeVarDecl.snd > level) throw ThrowTypeError(null, "The type variable '{0}' is defined at level {1} but used at level {2}.", name, typeVarDecl.snd, level);
@@ -416,7 +416,7 @@ namespace Metaphor.Compiler
 
 		public MType SubstType(MType type)
 		{
-			foreach (Tuple<TypeVarDecl, MType> s in subst)
+			foreach (Collections.Tuple<TypeVarDecl, MType> s in subst)
 				type = SubstType(type, s.fst, s.snd);
 			return type;
 		}
@@ -473,7 +473,7 @@ namespace Metaphor.Compiler
 
 		public bool PushTypeSubst(TypeVarDecl decl, MType type)
 		{
-			subst.Push(new Tuple<TypeVarDecl, MType>(decl, type));
+			subst.Push(new Collections.Tuple<TypeVarDecl, MType>(decl, type));
 			return true;
 		}
 
@@ -484,11 +484,11 @@ namespace Metaphor.Compiler
 		#endregion
 
 		#region Member scoping
-		protected Stack<Tuple<ForField, int>> fields = new Stack<Tuple<ForField, int>>();
+		protected Stack<Collections.Tuple<ForField, int>> fields = new Stack<Collections.Tuple<ForField, int>>();
 
 		public void PushField(ForField field)
 		{
-			fields.Push(new Tuple<ForField, int>(field, level));
+			fields.Push(new Collections.Tuple<ForField, int>(field, level));
 		}
 
 		public void PopField()
@@ -498,7 +498,7 @@ namespace Metaphor.Compiler
 
 		public MFieldInfo LookupField(string name, bool isStatic)
 		{
-			foreach (Tuple<ForField, int> field in fields)
+			foreach (Collections.Tuple<ForField, int> field in fields)
 				if (field.fst.name == name && field.fst.isStatic == isStatic)
 				{
 					if (field.snd > level) throw ThrowTypeError(null, "The reflected field '{0}' is defined at level {1} but used at level {2}.", name, field.snd, level);

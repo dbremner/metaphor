@@ -68,12 +68,12 @@ namespace Metaphor.Compiler
             Contract.Invariant(name != null);
         }
 
-		public static TypeVarDecl[] Compile(CompileState state, List<Tuple<Ident, int>> names, List<TypeParam> @params, Location loc)
         public enum Location { Class, Method, Stmt };
 
+		public static TypeVarDecl[] Compile(CompileState state, List<Collections.Tuple<Ident, int>> names, List<TypeParam> @params, Location loc)
 		{
 			List<TypeVarDecl> result = new List<TypeVarDecl>();
-			foreach (Tuple<Ident, int> name in names)
+			foreach (Collections.Tuple<Ident, int> name in names)
 			{
 				foreach (TypeVarDecl typeVar2 in result)
 					if (typeVar2.name == name.fst.Name)
@@ -211,10 +211,10 @@ namespace Metaphor.Compiler
 
 	public abstract class GenericType : TypeDecl
 	{
-		public List<Tuple<Ident, int>> typeParamNames;
+		public List<Collections.Tuple<Ident, int>> typeParamNames;
 		public List<TypeParam> typeParams;
 
-		public GenericType(IToken token, Modifier mods, Ident name, List<Tuple<Ident, int>> typeParamNames, List<TypeParam> typeParams)
+	    protected GenericType(IToken token, Modifier mods, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<TypeParam> typeParams)
 			: base(token, mods, name)
 		{
 			this.typeParamNames = CheckNull<Tuple<Ident, int>>(typeParamNames);
@@ -241,7 +241,7 @@ namespace Metaphor.Compiler
 
 		private M.ClassBuilder mClass;
 
-		public Class(IToken token, Modifier mods, Ident name, List<Tuple<Ident, int>> typeParamNames, List<Typ> baseTypes, List<TypeParam> typeParams, List<Member> members)
+		public Class(IToken token, Modifier mods, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<Typ> baseTypes, List<TypeParam> typeParams, List<Member> members)
 			: base(token, mods, name, typeParamNames, typeParams)
 		{
 			if (baseTypes != null) this.baseTypes = baseTypes;
@@ -344,7 +344,7 @@ namespace Metaphor.Compiler
 
 		private M.StructBuilder mStruct;
 
-		public Struct(IToken token, Modifier mods, Ident name, List<Tuple<Ident, int>> typeParamNames, List<Typ> baseTypes, List<TypeParam> typeParams, List<Member> members)
+		public Struct(IToken token, Modifier mods, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<Typ> baseTypes, List<TypeParam> typeParams, List<Member> members)
 			: base(token, mods, name, typeParamNames, typeParams)
 		{
 			this.baseTypes = CheckNull<Typ>(baseTypes);
@@ -424,7 +424,7 @@ namespace Metaphor.Compiler
 
 		private DelegateBuilder mDelegate;
 
-		public Delegate(IToken token, Modifier mods, Typ returnType, Ident name, List<Tuple<Ident, int>> typeParamNames, List<Param> @params, List<TypeParam> typeParams)
+		public Delegate(IToken token, Modifier mods, Typ returnType, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<Param> @params, List<TypeParam> typeParams)
 			: base(token, mods, name, typeParamNames, typeParams)
 		{
 			Contract.Requires(returnType != null);

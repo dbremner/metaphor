@@ -2375,7 +2375,7 @@ _loop225_breakloop:				;
 		List<Stmt> result;
 		
 		IToken  t1 = null;
-		result = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Stmt stmt = null;
+		result = null; Ident name = null; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null; Stmt stmt = null;
 		
 		try {      // for error handling
 			if (0==inputState.guessing)
@@ -2494,7 +2494,7 @@ _loop109_breakloop:					;
 		List<Stmt> result;
 		
 		IToken  t1 = null;
-		result = new List<Stmt>(); List<Stmt> stmts = null; Stmt stmt = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null;
+		result = new List<Stmt>(); List<Stmt> stmts = null; Stmt stmt = null; Ident name = null; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null;
 		
 		try {      // for error handling
 			switch ( LA(1) )
@@ -4028,16 +4028,16 @@ _loop101_breakloop:				;
 		return result;
 	}
 	
-	public List<Tuple<Ident, Expr>>  variable_declarators() //throws RecognitionException, TokenStreamException
+	public List<Collections.Tuple<Ident, Expr>>  variable_declarators() //throws RecognitionException, TokenStreamException
 {
-		List<Tuple<Ident, Expr>> result;
+		List<Collections.Tuple<Ident, Expr>> result;
 		
-		result = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>();
+		result = null; Collections.Tuple<Ident, Expr> var = new Collections.Tuple<Ident, Expr>();
 		
 		try {      // for error handling
 			if (0==inputState.guessing)
 			{
-				result = new List<Tuple<Ident, Expr>>();
+				result = new List<Collections.Tuple<Ident, Expr>>();
 			}
 			var=variable_declarator();
 			if (0==inputState.guessing)
@@ -4205,7 +4205,7 @@ _loop142_breakloop:				;
 		IToken  t17 = null;
 		IToken  t18 = null;
 		IToken  t19 = null;
-		result = null; Expr expr = null; Stmt stmt = null; Stmt stmt2 = null; List<Case> cases = null; Either<LocalDecl, List<Expr>> forInit = new Either<LocalDecl, List<Expr>>(); List<Expr> exprs = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; List<Catch> catches = null; Finally fin = null; List<Tuple<Ident,int>> typeParamNames = null; List<TypeParam> typeParamCons = null; bool isStatic = false; Ident retType = null; List<Tuple<string,bool>> pars = null; Ident paramName = null; bool paramRef = false;
+		result = null; Expr expr = null; Stmt stmt = null; Stmt stmt2 = null; List<Case> cases = null; Either<LocalDecl, List<Expr>> forInit = new Either<LocalDecl, List<Expr>>(); List<Expr> exprs = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; List<Catch> catches = null; Finally fin = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<TypeParam> typeParamCons = null; bool isStatic = false; Ident retType = null; List<Collections.Tuple<string,bool>> pars = null; Ident paramName = null; bool paramRef = false;
 		
 		try {      // for error handling
 			switch ( LA(1) )
@@ -5264,16 +5264,16 @@ _loop153_breakloop:				;
 		return result;
 	}
 	
-	public List<Tuple<Ident,int>>  type_parameter_list() //throws RecognitionException, TokenStreamException
+	public List<Collections.Tuple<Ident,int>>  type_parameter_list() //throws RecognitionException, TokenStreamException
 {
-		List<Tuple<Ident,int>> result;
+		List<Collections.Tuple<Ident,int>> result;
 		
-		result = null; Tuple<Ident,int> typeParam;
+		result = null; Collections.Tuple<Ident,int> typeParam;
 		
 		try {      // for error handling
 			if (0==inputState.guessing)
 			{
-				result = new List<Tuple<Ident,int>>();
+				result = new List<Collections.Tuple<Ident,int>>();
 			}
 			match(LANGLE);
 			typeParam=type_parameter();
@@ -5364,11 +5364,11 @@ _loop190_breakloop:				;
 		return result;
 	}
 	
-	protected List<Tuple<string, bool>>  formal_argument_pattern_list() //throws RecognitionException, TokenStreamException
+	protected List<Collections.Tuple<string, bool>>  formal_argument_pattern_list() //throws RecognitionException, TokenStreamException
 {
-		List<Tuple<string, bool>> result;
+		List<Collections.Tuple<string, bool>> result;
 		
-		result = new List<Tuple<string, bool>>(); Tuple<string, bool> pat = new Tuple<string, bool>();
+		result = new List<Collections.Tuple<string, bool>>(); Collections.Tuple<string, bool> pat = new Collections.Tuple<string, bool>();
 		
 		try {      // for error handling
 			{
@@ -5430,11 +5430,11 @@ _loop135_breakloop:						;
 		return result;
 	}
 	
-	protected Tuple<string, bool>  formal_argument_pattern() //throws RecognitionException, TokenStreamException
+	protected Collections.Tuple<string, bool>  formal_argument_pattern() //throws RecognitionException, TokenStreamException
 {
-		Tuple<string, bool> result;
+        Collections.Tuple<string, bool> result;
 		
-		result = new Tuple<string, bool>(); Ident name = null;
+		result = new Collections.Tuple<string, bool>(); Ident name = null;
 		
 		try {      // for error handling
 			{
@@ -5480,11 +5480,11 @@ _loop135_breakloop:						;
 		return result;
 	}
 	
-	public Tuple<Ident, Expr>  variable_declarator() //throws RecognitionException, TokenStreamException
+	public Collections.Tuple<Ident, Expr>  variable_declarator() //throws RecognitionException, TokenStreamException
 {
-		Tuple<Ident, Expr> result;
+            Collections.Tuple<Ident, Expr> result;
 		
-		result = new Tuple<Ident, Expr>(); Ident name = null; Expr init = null;
+		result = new Collections.Tuple<Ident, Expr>(); Ident name = null; Expr init = null;
 		
 		try {      // for error handling
 			name=identifier();
@@ -5510,7 +5510,7 @@ _loop135_breakloop:						;
 			}
 			if (0==inputState.guessing)
 			{
-				result = new Tuple<Ident, Expr>(name, init);
+				result = new Collections.Tuple<Ident, Expr>(name, init);
 			}
 		}
 		catch (RecognitionException ex)
@@ -5698,7 +5698,8 @@ _loop135_breakloop:						;
 {
 		Module result;
 		
-		result = null; List<Ident> usings = null; Tuple<List<Namespace>, List<TypeDecl>> body = new Tuple<List<Namespace>, List<TypeDecl>>();
+		result = null; List<Ident> usings = null;
+            Collections.Tuple<List<Namespace>, List<TypeDecl>> body = new Collections.Tuple<List<Namespace>, List<TypeDecl>>();
 		
 		try {      // for error handling
 			usings=using_directives();
@@ -5770,11 +5771,11 @@ _loop166_breakloop:				;
 		return result;
 	}
 	
-	public Tuple<List<Namespace>, List<TypeDecl>>  namespace_body() //throws RecognitionException, TokenStreamException
+	public Collections.Tuple<List<Namespace>, List<TypeDecl>>  namespace_body() //throws RecognitionException, TokenStreamException
 {
-		Tuple<List<Namespace>, List<TypeDecl>> result;
+            Collections.Tuple<List<Namespace>, List<TypeDecl>> result;
 		
-		result = new Tuple<List<Namespace>, List<TypeDecl>>(); Either<Namespace, TypeDecl> member = new Either<Namespace, TypeDecl>();
+		result = new Collections.Tuple<List<Namespace>, List<TypeDecl>>(); Either<Namespace, TypeDecl> member = new Either<Namespace, TypeDecl>();
 		
 		try {      // for error handling
 			if (0==inputState.guessing)
@@ -5827,7 +5828,7 @@ _loop163_breakloop:				;
 		Namespace result;
 		
 		IToken  t = null;
-		result = null; Ident name = null; Tuple<List<Namespace>, List<TypeDecl>> body = new Tuple<List<Namespace>, List<TypeDecl>>();
+		result = null; Ident name = null; Collections.Tuple<List<Namespace>, List<TypeDecl>> body = new Collections.Tuple<List<Namespace>, List<TypeDecl>>();
 		
 		try {      // for error handling
 			t = LT(1);
@@ -6111,7 +6112,7 @@ _loop173_breakloop:				;
 		TypeDecl result;
 		
 		IToken  t = null;
-		result = null; Ident name = null; List<Tuple<Ident,int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null;
+		result = null; Ident name = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null;
 		
 		try {      // for error handling
 			t = LT(1);
@@ -6245,7 +6246,7 @@ _loop173_breakloop:				;
 		TypeDecl result;
 		
 		IToken  t = null;
-		result = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null;
+		result = null; Ident name = null; List<Collections.Tuple<Ident, int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null;
 		
 		try {      // for error handling
 			t = LT(1);
@@ -6607,7 +6608,7 @@ _loop240_breakloop:				;
 		TypeDecl result;
 		
 		IToken  t = null;
-		result = null; Typ retType = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null;
+		result = null; Typ retType = null; Ident name = null; List<Collections.Tuple<Ident, int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null;
 		
 		try {      // for error handling
 			t = LT(1);
@@ -6901,7 +6902,7 @@ _loop187_breakloop:				;
 		IToken  t3 = null;
 		IToken  t4 = null;
 		IToken  t5 = null;
-		result = null; Modifier mods = Modifier.None; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Ident name = null; List<Param> pars = null; CtorInit ctorInit = null; List<Stmt> body = null; Expr expr = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); MethodHeader head = null; TypeDecl decl = null;
+		result = null; Modifier mods = Modifier.None; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null; Ident name = null; List<Param> pars = null; CtorInit ctorInit = null; List<Stmt> body = null; Expr expr = null; Collections.Tuple<Ident, Expr> var = new Collections.Tuple<Ident, Expr>(); MethodHeader head = null; TypeDecl decl = null;
 		
 		try {      // for error handling
 			if (0==inputState.guessing)
@@ -7444,11 +7445,11 @@ _loop212_breakloop:				;
 		return result;
 	}
 	
-	public Tuple<Ident,int>  type_parameter() //throws RecognitionException, TokenStreamException
+	public Collections.Tuple<Ident,int>  type_parameter() //throws RecognitionException, TokenStreamException
 {
-		Tuple<Ident,int> result;
+            Collections.Tuple<Ident,int> result;
 		
-		result = new Tuple<Ident,int>(); Ident typeParam = null; int levelKind = 0;
+		result = new Collections.Tuple<Ident,int>(); Ident typeParam = null; int levelKind = 0;
 		
 		try {      // for error handling
 			{    // ( ... )*
@@ -7473,7 +7474,7 @@ _loop184_breakloop:				;
 			typeParam=identifier();
 			if (0==inputState.guessing)
 			{
-				result = new Tuple<Ident,int>(typeParam, levelKind);
+				result = new Collections.Tuple<Ident,int>(typeParam, levelKind);
 			}
 		}
 		catch (RecognitionException ex)
@@ -7839,7 +7840,7 @@ _loop194_breakloop:				;
 {
 		MethodHeader result;
 		
-		result = null; List<Tuple<Ident,int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null;
+		result = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null;
 		
 		try {      // for error handling
 			{

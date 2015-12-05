@@ -100,12 +100,12 @@ namespace Metaphor.Compiler
 		public string name;
 		public Expr init;
 
-		public static void Add(List<Stmt> stmts, Typ type, List<Tuple<Ident, Expr>> decls)
+		public static void Add(List<Stmt> stmts, Typ type, List<Collections.Tuple<Ident, Expr>> decls)
 		{
-            foreach (Tuple<Ident, Expr> decl in decls)
             Contract.Requires(stmts != null);
             Contract.Requires(type != null);
             Contract.Requires(decls != null && decls.Count != 0);
+            foreach (Collections.Tuple<Ident, Expr> decl in decls)
                 stmts.Add(new LocalDecl(type, decl.fst, decl.snd));
 		}
 
@@ -150,9 +150,9 @@ namespace Metaphor.Compiler
 		public string name;
 		public Expr init;
 
-		public static void Add(List<Stmt> stmts, IToken token, Typ type, List<Tuple<Ident, Expr>> decls)
+		public static void Add(List<Stmt> stmts, IToken token, Typ type, List<Collections.Tuple<Ident, Expr>> decls)
 		{
-			foreach (Tuple<Ident, Expr> decl in decls)
+			foreach (Collections.Tuple<Ident, Expr> decl in decls)
 				stmts.Add(new ConstDecl(token, type, decl.fst.Name, decl.snd));
 		}
 
@@ -599,14 +599,14 @@ namespace Metaphor.Compiler
 
 	public class TypeIf : Stmt
 	{
-		public List<Tuple<Ident, int>> patternVars;
+		public List<Collections.Tuple<Ident, int>> patternVars;
 		public string name;
 		public List<TypeParam> constraints;
 		public Typ pattern;
 		public Stmt ifTrue;
 		public Stmt ifFalse;
 
-		public TypeIf(IToken token, List<Tuple<Ident, int>> patternVars, Ident ident, Typ pattern, List<TypeParam> constraints, Stmt ifTrue, Stmt ifFalse)
+		public TypeIf(IToken token, List<Collections.Tuple<Ident, int>> patternVars, Ident ident, Typ pattern, List<TypeParam> constraints, Stmt ifTrue, Stmt ifFalse)
 			: base(token)
 		{
 			Contract.Requires(ident != null);
@@ -614,7 +614,7 @@ namespace Metaphor.Compiler
 			Contract.Requires(ifTrue != null);
 			this.patternVars = CheckNull<Collections.Tuple<Ident, int>>(patternVars);
 			for (int i = 0; i < this.patternVars.Count; i++)
-				if (this.patternVars[i].snd < 1) this.patternVars[i] = new Tuple<Ident, int>(this.patternVars[i].fst, 1);
+				if (this.patternVars[i].snd < 1) this.patternVars[i] = new Collections.Tuple<Ident, int>(this.patternVars[i].fst, 1);
 
 			this.name = ident.Name;
 			this.pattern = pattern;
@@ -694,11 +694,11 @@ namespace Metaphor.Compiler
 		public string name;
 		public bool isStatic;
 		public string retType;
-		public List<Tuple<string,bool>> @params;
+		public List<Collections.Tuple<string,bool>> @params;
 		public Typ type;
 		public Stmt stmt;
 
-		public ForMember(IToken token, bool isStatic, string retType, Ident ident, List<Tuple<string, bool>> @params, Typ type, Stmt stmt)
+		public ForMember(IToken token, bool isStatic, string retType, Ident ident, List<Collections.Tuple<string, bool>> @params, Typ type, Stmt stmt)
 			: base(token)
 		{
 			Contract.Requires(ident != null);

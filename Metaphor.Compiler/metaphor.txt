@@ -465,7 +465,7 @@ expression returns [Expr result] { result = null; }:
 ;
 
 //C.2.5 Statements
-block returns [List<Stmt> result] { result = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Stmt stmt = null; }: 
+block returns [List<Stmt> result] { result = null; Ident name = null; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null; Stmt stmt = null; }: 
 	{ result = new List<Stmt>(); }
 	LBRACE 
 	(
@@ -490,7 +490,7 @@ embedded_statement returns [Stmt result] { result = null; List<Stmt> stmts = nul
 	expr = expression SEMI { result = new Expression(expr); }
 ;
 
-quoted_statement [ref Expr expr] returns [List<Stmt> result] { result = new List<Stmt>(); List<Stmt> stmts = null; Stmt stmt = null; Ident name = null; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; }:
+quoted_statement [ref Expr expr] returns [List<Stmt> result] { result = new List<Stmt>(); List<Stmt> stmts = null; Stmt stmt = null; Ident name = null; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null; }:
 |
 	(IDENTIFIER COLON) => name = identifier COLON result = quoted_statement [ref expr] { result.Add(new Label(name)); }
 |
@@ -545,7 +545,7 @@ quoted_statement [ref Expr expr] returns [List<Stmt> result] { result = new List
 */
 ;
 
-actual_statement returns [Stmt result] { result = null; Expr expr = null; Stmt stmt = null; Stmt stmt2 = null; List<Case> cases = null; Either<LocalDecl, List<Expr>> forInit = new Either<LocalDecl, List<Expr>>(); List<Expr> exprs = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; List<Catch> catches = null; Finally fin = null; List<Tuple<Ident,int>> typeParamNames = null; List<TypeParam> typeParamCons = null; bool isStatic = false; Ident retType = null; List<Tuple<string,bool>> pars = null; Ident paramName = null; bool paramRef = false; }:
+actual_statement returns [Stmt result] { result = null; Expr expr = null; Stmt stmt = null; Stmt stmt2 = null; List<Case> cases = null; Either<LocalDecl, List<Expr>> forInit = new Either<LocalDecl, List<Expr>>(); List<Expr> exprs = null; Typ typ = null; Ident name = null; List<Stmt> stmts = null; List<Catch> catches = null; Finally fin = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<TypeParam> typeParamCons = null; bool isStatic = false; Ident retType = null; List<Collections.Tuple<string,bool>> pars = null; Ident paramName = null; bool paramRef = false; }:
 	SEMI { result  = new Empty(); }
 |
 	t1 : IF LPAREN expr = expression RPAREN stmt = embedded_statement (options {warnWhenFollowAmbig = false;}: ELSE stmt2 = embedded_statement)? { result = new If(t1, expr, stmt, stmt2); }
@@ -608,7 +608,7 @@ actual_statement returns [Stmt result] { result = null; Expr expr = null; Stmt s
 ;
 
 protected
-formal_argument_pattern_list returns [List<Tuple<string, bool>> result] { result = new List<Tuple<string, bool>>(); Tuple<string, bool> pat = new Tuple<string, bool>(); }:
+formal_argument_pattern_list returns [List<Collections.Tuple<string, bool>> result] { result = new List<Collections.Tuple<string, bool>>(); Tuple<string, bool> pat = new Tuple<string, bool>(); }:
 	(
 		pat = formal_argument_pattern { result.Add(pat); }
 		(COMMA pat = formal_argument_pattern { result.Add(pat); })*
@@ -629,8 +629,8 @@ variable_declarator returns [Tuple<Ident, Expr> result] { result = new Tuple<Ide
 	name = identifier (ASSIGN init = variable_initializer)? { result = new Tuple<Ident, Expr>(name, init); }
 ;
 
-variable_declarators returns [List<Tuple<Ident, Expr>> result] { result = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); }: 
-	{ result = new List<Tuple<Ident, Expr>>(); }
+variable_declarators returns [List<Collections.Tuple<Ident, Expr>> result] { result = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); }: 
+	{ result = new List<Collections.Tuple<Ident, Expr>>(); }
 	var = variable_declarator { result.Add(var); }
 	(
 		COMMA var = variable_declarator { result.Add(var); }
@@ -774,12 +774,12 @@ modifier returns [Modifier result] { result = Modifier.None; }:
 ;
 
 //C.2.7 Classes
-class_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Tuple<Ident,int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
+class_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
 	t : CLASS name = identifier (typeParamNames = type_parameter_list)? (baseTypes = class_base)? typeParams = type_parameter_constraints_clauses body = class_body (SEMI)? { result = new Class(t, mods, name, typeParamNames, baseTypes, typeParams, body); }
 ;
 
-type_parameter_list returns [List<Tuple<Ident,int>> result] { result = null; Tuple<Ident,int> typeParam; }: 
-	{ result = new List<Tuple<Ident,int>>(); }
+type_parameter_list returns [List<Collections.Tuple<Ident,int>> result] { result = null; Tuple<Ident,int> typeParam; }: 
+	{ result = new List<Collections.Tuple<Ident,int>>(); }
 	LANGLE typeParam = type_parameter { result.Add(typeParam); }
 	(COMMA typeParam = type_parameter { result.Add(typeParam); })* 
 	RANGLE
@@ -820,7 +820,7 @@ type_parameter_constraint returns [TypeParamCon result] { result = null; Typ typ
 	t3 : NEW LPAREN RPAREN { result = new TypeParamCtorCon(t3); }
 ;
 
-class_body returns [List<Member> result] { result = null; Modifier mods = Modifier.None; Typ typ = null; List<Tuple<Ident, Expr>> vars = null; Ident name = null; List<Param> pars = null; CtorInit ctorInit = null; List<Stmt> body = null; Expr expr = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); MethodHeader head = null; TypeDecl decl = null; }: 
+class_body returns [List<Member> result] { result = null; Modifier mods = Modifier.None; Typ typ = null; List<Collections.Tuple<Ident, Expr>> vars = null; Ident name = null; List<Param> pars = null; CtorInit ctorInit = null; List<Stmt> body = null; Expr expr = null; Tuple<Ident, Expr> var = new Tuple<Ident, Expr>(); MethodHeader head = null; TypeDecl decl = null; }: 
 	{ result = new List<Member>(); }
 	LBRACE 
 	(
@@ -876,7 +876,7 @@ constructor_initializer returns [CtorInit result] { result = null; bool b = fals
 	LPAREN (args = argument_list)? RPAREN { result = new CtorInit(t, b, args); }
 ;
 
-method_header [Typ retType, Ident name] returns [MethodHeader result] { result = null; List<Tuple<Ident,int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
+method_header [Typ retType, Ident name] returns [MethodHeader result] { result = null; List<Collections.Tuple<Ident,int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
 	(typeParamNames = type_parameter_list)? LPAREN (pars = formal_parameter_list)? RPAREN  typeParams = type_parameter_constraints_clauses	{ result = new MethodHeader(retType, name, typeParamNames, pars, typeParams); }
 ;
 
@@ -903,7 +903,7 @@ fixed_parameter returns [Param result] { result = null; Dir dir = Dir.In; Typ ty
 ;
 
 //C.2.8 Structs
-struct_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
+struct_declaration [Modifier mods] returns [TypeDecl result] { result = null; Ident name = null; List<Collections.Tuple<Ident, int>> typeParamNames = null; List<Typ> baseTypes = null; List<TypeParam> typeParams = null; List<Member> body = null; }: 
 	t: STRUCT name = identifier (typeParamNames = type_parameter_list)? (baseTypes = class_base)? typeParams = type_parameter_constraints_clauses body = class_body (SEMI)? { result = new Struct(t, mods, name, typeParamNames, baseTypes, typeParams, body); }
 ;
 
@@ -964,7 +964,7 @@ enum_member_declarations : enum_member_declaration (COMMA enum_member_declaratio
 enum_member_declaration: IDENTIFIER ASSIGN literal;
 
 //C.2.12 Delegates
-delegate_declaration [Modifier modifiers] returns [TypeDecl result] { result = null; Typ retType = null; Ident name = null; List<Tuple<Ident, int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
+delegate_declaration [Modifier modifiers] returns [TypeDecl result] { result = null; Typ retType = null; Ident name = null; List<Collections.Tuple<Ident, int>> typeParamNames = null; List<Param> pars = null; List<TypeParam> typeParams = null; }: 
 	t : DELEGATE retType = type name = identifier (typeParamNames = type_parameter_list)? LPAREN (pars = formal_parameter_list)? RPAREN  typeParams = type_parameter_constraints_clauses SEMI { result = new Delegate(t, modifiers, retType, name, typeParamNames, pars, typeParams); };
 
 

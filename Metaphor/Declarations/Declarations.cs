@@ -29,16 +29,16 @@ namespace Metaphor
 		internal static Stack<MConstructorBuilder> allCtors = new Stack<MConstructorBuilder>();
 		internal static Stack<MMethodBuilder> allMethods = new Stack<MMethodBuilder>();
 
-		private static Stack<Tuple<int, int, int, int>> marks = new Stack<Tuple<int, int, int, int>>();
+		private static readonly Stack<Collections.Tuple<int, int, int, int>> marks = new Stack<Collections.Tuple<int, int, int, int>>();
 
 		internal static void Push()
 		{
-			marks.Push(new Tuple<int, int, int, int>(allTypes.Count, allFields.Count, allCtors.Count, allMethods.Count));
+			marks.Push(new Collections.Tuple<int, int, int, int>(allTypes.Count, allFields.Count, allCtors.Count, allMethods.Count));
 		}
 
 		internal static void Pop()
 		{
-			Tuple<int, int, int, int> mark = marks.Pop();
+		    Collections.Tuple<int, int, int, int> mark = marks.Pop();
 			while (allTypes.Count > mark.fst) allTypes.Pop();
 			while (allFields.Count > mark.snd) allFields.Pop();
 			while (allCtors.Count > mark.trd) allCtors.Pop();

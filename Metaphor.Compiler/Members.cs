@@ -200,7 +200,7 @@ namespace Metaphor.Compiler
 	public class Method : Member
 	{
 		public Typ returnType;
-		public List<Tuple<Ident, int>> typeParamNames;
+		public List<Collections.Tuple<Ident, int>> typeParamNames;
 		public List<Param> @params;
 		public List<TypeParam> typeParams;
 		public List<Stmt> body;
@@ -252,11 +252,11 @@ namespace Metaphor.Compiler
 	{
 		public Typ type;
 		public Ident name;
-		public List<Tuple<Ident, int>> typeParamNames;
+		public List<Collections.Tuple<Ident, int>> typeParamNames;
 		public List<Param> @params;
 		public List<TypeParam> typeParams;
 
-		public MethodHeader(Typ type, Ident name, List<Tuple<Ident, int>> typeParamNames, List<Param> @params, List<TypeParam> typeParams)
+		public MethodHeader(Typ type, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<Param> @params, List<TypeParam> typeParams)
 		{
 			this.type = type;
 			this.name = name;

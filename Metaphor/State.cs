@@ -700,13 +700,13 @@ namespace Metaphor
 
 		#region Loop Management
 		// the continue and break labels for the nested loops inside this function/method
-		private Stack<Tuple<Label, Label>> loops = new Stack<Tuple<Label, Label>>();
+		private readonly Stack<Collections.Tuple<Label, Label>> loops = new Stack<Collections.Tuple<Label, Label>>();
 
 		public void PushLoop(out Label @continue, out Label @break)
 		{
 			@continue = code.DefineLabel();
 			@break = code.DefineLabel();
-			loops.Push(new Tuple<Label, Label>(@continue, @break));
+			loops.Push(new Collections.Tuple<Label, Label>(@continue, @break));
 		}
 
 		public void PopLoop()
@@ -942,13 +942,13 @@ namespace Metaphor
 
 		public void EmitContinue()
 		{
-			Tuple<Label, Label> labels = loops.Peek();
+		    Collections.Tuple<Label, Label> labels = loops.Peek();
 			code.Emit(OpCodes.Br, labels.fst);
 		}
 
 		public void EmitBreak()
 		{
-			Tuple<Label, Label> labels = loops.Peek();
+		    Collections.Tuple<Label, Label> labels = loops.Peek();
 			code.Emit(OpCodes.Br, labels.snd);
 		}
 

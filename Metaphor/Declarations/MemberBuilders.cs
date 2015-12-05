@@ -247,40 +247,40 @@ namespace Metaphor
 			return ctorBuilder.GetILGenerator();
 		}
 
-		private List<Tuple<int, FieldBuilder>> stagedTypeVars;
+		private List<Collections.Tuple<int, FieldBuilder>> stagedTypeVars;
 
 		internal override void GenerateMembers(ModuleGenState state)
 		{
 			int paramPos = 1;
 			TypeBuilder declaringScope = declaringType.typeBuilder;
-			List<Tuple<Type, string>> paramTypes = new List<Tuple<Type, string>>();
-			stagedTypeVars = new List<Tuple<int, FieldBuilder>>();
+			List<Collections.Tuple<Type, string>> paramTypes = new List<Collections.Tuple<Type, string>>();
+			stagedTypeVars = new List<Collections.Tuple<int, FieldBuilder>>();
 			@this.SetLocation();
 			foreach (ParamDecl param in @params)
 			{
 				param.SetLocation(paramPos++);
-				paramTypes.Add(new Tuple<Type, string>(param.GetSystemType(), param.name));
+				paramTypes.Add(new Collections.Tuple<Type, string>(param.GetSystemType(), param.name));
 			}
 			foreach (TypeVarDecl typeParam in declaringType.@params)
 			{
 				if (typeParam.levelKind > 0)
 				{
-					paramTypes.Add(new Tuple<Type, string>(typeof(MType), typeParam.name));
+					paramTypes.Add(new Collections.Tuple<Type, string>(typeof(MType), typeParam.name));
 					FieldBuilder field = declaringScope.DefineField(typeParam.name, typeof(MType), FieldAttributes.Private);
-					stagedTypeVars.Add(new Tuple<int, FieldBuilder>(paramPos++, field));
+					stagedTypeVars.Add(new Collections.Tuple<int, FieldBuilder>(paramPos++, field));
 					((ClassReflTypeVarDecl) typeParam).Generate(field);
 				}
 			}
-			ctorBuilder = declaringScope.DefineConstructor(attr | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.HasThis, Tuple<Type, string>.MapFst(paramTypes.ToArray()));
+			ctorBuilder = declaringScope.DefineConstructor(attr | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.HasThis, Collections.Tuple<Type, string>.MapFst(paramTypes.ToArray()));
 			int paramIndex = 1;
-			foreach (Tuple<Type, string> paramType in paramTypes)
+			foreach (Collections.Tuple<Type, string> paramType in paramTypes)
 				ctorBuilder.DefineParameter(paramIndex++, ParameterAttributes.None, paramType.snd);
 		}
 
 		internal override void GenerateCode(ModuleGenState state)
 		{
 			CodeGenState cgState = state.DefineMethod(this);
-			foreach (Tuple<int, FieldBuilder> stagedTypeVar in stagedTypeVars)
+			foreach (Collections.Tuple<int, FieldBuilder> stagedTypeVar in stagedTypeVars)
 			{
 				cgState.EmitLdarg(0);
 				cgState.EmitLdarg(stagedTypeVar.fst);
@@ -418,7 +418,7 @@ namespace Metaphor
 
 			//TypeVarDecl.PushVars(typeParams);
 			List<string> typeParamNames = new List<string>();
-			List<Tuple<Type, string>> paramTypes = new List<Tuple<Type, string>>();
+			List<Collections.Tuple<Type, string>> paramTypes = new List<Collections.Tuple<Type, string>>();
 			foreach (TypeVarDecl typeParam in typeParams)
 			{
 				if (typeParam.levelKind == 0) typeParamNames.Add(typeParam.name);
@@ -439,21 +439,21 @@ namespace Metaphor
 			foreach (ParamDecl param in @params)
 			{
 				param.SetLocation(paramPos++);
-				paramTypes.Add(new Tuple<Type, string>(param.GetSystemType(), param.name));
+				paramTypes.Add(new Collections.Tuple<Type, string>(param.GetSystemType(), param.name));
 			}
 			foreach (TypeVarDecl typeParam in typeParams)
 			{
 				if (typeParam.levelKind > 0)
 				{
-					paramTypes.Add(new Tuple<Type, string>(typeof(MType), typeParam.name));
+					paramTypes.Add(new Collections.Tuple<Type, string>(typeof(MType), typeParam.name));
 					((MethodReflTypeVarDecl) typeParam).Generate(paramPos++);
 				}
 			}
 			//TypeVarDecl.PopVars(typeParams.Length);
 
-			methodBuilder.SetParameters(Tuple<Type, string>.MapFst(paramTypes.ToArray()));
+			methodBuilder.SetParameters(Collections.Tuple<Type, string>.MapFst(paramTypes.ToArray()));
 			int paramIndex = 1;
-			foreach (Tuple<Type, string> paramType in paramTypes)
+			foreach (Collections.Tuple<Type, string> paramType in paramTypes)
 			{
 				ParameterBuilder p = methodBuilder.DefineParameter(paramIndex, ParameterAttributes.None, paramType.snd);
 				//if (paramIndex <= @params.Length)
