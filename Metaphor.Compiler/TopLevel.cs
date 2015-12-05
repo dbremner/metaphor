@@ -65,8 +65,8 @@ namespace Metaphor.Compiler
 			: base(token)
 		{
             this.name = name != null ? name.Name : null;
-			this.namespaces = CheckNull<Namespace>(namespaces);
-			this.typeDecls = CheckNull<TypeDecl>(typeDecls);
+			this.namespaces = CheckNull(namespaces);
+			this.typeDecls = CheckNull(typeDecls);
 		}
 
         public void CompileTypes(CompileState state, MModuleBuilder mMod)

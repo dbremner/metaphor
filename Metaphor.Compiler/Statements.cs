@@ -745,7 +745,7 @@ namespace Metaphor.Compiler
 		public EscapeStmt(IToken token, List<Stmt> stmts)
 			: base(token)
 		{
-			this.stmts = CheckNull<Stmt>(stmts);
+			this.stmts = CheckNull(stmts);
 		}
 
 		public override Code Compile(CompileState state)

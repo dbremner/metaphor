@@ -83,8 +83,8 @@ namespace Metaphor.Compiler
 		public Constructor(Modifier mods, Ident name, List<Param> @params, CtorInit ctorInit, List<Stmt> body)
 			: base(name.Token, mods, name)
 		{
-			this.@params = CheckNull<Param>(@params);
 			Contract.Requires(body != null);
+			this.@params = CheckNull(@params);
 			this.ctorInit = ctorInit;
 			this.body = body;
 		}
@@ -166,7 +166,7 @@ namespace Metaphor.Compiler
 			: base(token)
 		{
 			this.onBase = onBase;
-			this.exprs = CheckNull<Arg>(exprs);
+			this.exprs = CheckNull(exprs);
 		}
 
 		public Code CompileCode(CompileState state)
@@ -212,9 +212,9 @@ namespace Metaphor.Compiler
 		{
 			Contract.Requires(head.type != null);
 			this.returnType = head.type;
-			this.typeParamNames = CheckNull<Tuple<Ident, int>>(head.typeParamNames);
-			this.@params = CheckNull<Param>(head.@params);
-			this.typeParams = CheckNull<TypeParam>(head.typeParams);
+			this.typeParamNames = CheckNull(head.typeParamNames);
+			this.@params = CheckNull(head.@params);
+			this.typeParams = CheckNull(head.typeParams);
 			this.body = body;
 		}
 

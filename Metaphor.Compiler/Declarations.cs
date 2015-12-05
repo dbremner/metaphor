@@ -217,8 +217,8 @@ namespace Metaphor.Compiler
 	    protected GenericType(IToken token, Modifier mods, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<TypeParam> typeParams)
 			: base(token, mods, name)
 		{
-			this.typeParamNames = CheckNull<Tuple<Ident, int>>(typeParamNames);
-			this.typeParams = CheckNull<TypeParam>(typeParams);
+			this.typeParamNames = CheckNull(typeParamNames);
+			this.typeParams = CheckNull(typeParams);
 		}
 
 		protected TypeVarDecl[] CompileGenericParams(CompileState state)
@@ -250,7 +250,7 @@ namespace Metaphor.Compiler
 				this.baseTypes = new List<Typ>();
 				this.baseTypes.Add(PrimType.CreateObject(null));
 			}
-			this.members = CheckNull<Member>(members);
+			this.members = CheckNull(members);
 		}
 
 		public override void CompileTypes(CompileState state, M.MModuleBuilder mMod)
@@ -347,8 +347,8 @@ namespace Metaphor.Compiler
 		public Struct(IToken token, Modifier mods, Ident name, List<Collections.Tuple<Ident, int>> typeParamNames, List<Typ> baseTypes, List<TypeParam> typeParams, List<Member> members)
 			: base(token, mods, name, typeParamNames, typeParams)
 		{
-			this.baseTypes = CheckNull<Typ>(baseTypes);
-			this.members = CheckNull<Member>(members);
+			this.baseTypes = CheckNull(baseTypes);
+			this.members = CheckNull(members);
 		}
 
 		public override void CompileTypes(CompileState state, M.MModuleBuilder mMod)
@@ -429,7 +429,7 @@ namespace Metaphor.Compiler
 		{
 			Contract.Requires(returnType != null);
 			this.returnType = returnType;
-			this.@params = CheckNull<Param>(@params);
+			this.@params = CheckNull(@params);
 		}
 
 		public override void CompileTypes(CompileState state, M.MModuleBuilder mMod)

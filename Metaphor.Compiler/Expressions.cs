@@ -1449,7 +1449,7 @@ namespace Metaphor.Compiler
 		public Bracket(IToken token, List<Stmt> stmts, Expr expr)
 			: base(token)
 		{
-			this.stmts = CheckNull<Stmt>(stmts);
+			this.stmts = CheckNull(stmts);
 			this.expr = expr;
 		}
 
@@ -1561,7 +1561,7 @@ namespace Metaphor.Compiler
 		{
 			Contract.Requires(stmts != null);
 			this.name = name != null ? name.Name : null;
-			this.@params = CheckNull<Param>(@params);
+			this.@params = CheckNull(@params);
 			this.stmts = stmts;
 		}
 
