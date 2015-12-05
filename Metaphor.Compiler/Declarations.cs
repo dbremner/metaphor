@@ -492,7 +492,8 @@ namespace Metaphor.Compiler
 		{
 			int num = @params.Count;
 			ParamDecl[] mParams = new ParamDecl[num];
-			for (int i = 0; i < num; i++) mParams[i] = @params[i].Compile(state);
+			for (int i = 0; i < num; i++)
+                mParams[i] = @params[i].Compile(state);
 			return mParams;
 		}
 

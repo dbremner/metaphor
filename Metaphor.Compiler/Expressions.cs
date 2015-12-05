@@ -72,7 +72,8 @@ namespace Metaphor.Compiler
 		{
 			int num = exprs.Count;
 			Code[] mCode = new Code[num];
-			for (int i = 0; i < num; i++) mCode[i] = exprs[i].CompileRValue(state);
+			for (int i = 0; i < num; i++)
+                mCode[i] = exprs[i].CompileRValue(state);
 			return mCode;
 		}
 
@@ -115,7 +116,8 @@ namespace Metaphor.Compiler
 			{
 				MType[] mTypes = new MType[values.Count];
 				int index = 0;
-				foreach (Value value in values) mTypes[index++] = value.GetMType();
+				foreach (Value value in values)
+                    mTypes[index++] = value.GetMType();
 				return mTypes;
 			}
 		}
@@ -297,15 +299,18 @@ namespace Metaphor.Compiler
 
         public M.Code Compile(CompileState state)
 		{
-			if ((dir & Dir.Out) != 0) return new Ref(expr.CompileLValue(state));
-			else return expr.CompileRValue(state);
+			if ((dir & Dir.Out) != 0)
+                return new Ref(expr.CompileLValue(state));
+			else
+                return expr.CompileRValue(state);
 		}
 
 		public static M.Code[] Compile(CompileState state, List<Arg> args)
 		{
 			int num = args.Count;
 			M.Code[] mArgs = new M.Code[num];
-			for (int i = 0; i < num; i++) mArgs[i] = args[i].Compile(state);
+			for (int i = 0; i < num; i++)
+                mArgs[i] = args[i].Compile(state);
 			return mArgs;
 		}
 	}
