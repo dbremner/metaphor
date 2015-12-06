@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 
 namespace Metaphor
@@ -150,14 +151,14 @@ namespace Metaphor
 	{
 		public MethodAttributes attr;
 		public ThisDecl @this;
-		public ParamDecl[] @params;
+	    [CanBeNull] public ParamDecl[] @params;
 		public MType retType;
 		public Code stmt;
 
 		[NonSerialized]
 		protected List<Function> functions;
 
-		public MethodBaseBuilder(int sym, MethodAttributes attr, ThisDecl @this, ParamDecl[] @params, MType retType)
+	    protected MethodBaseBuilder(int sym, MethodAttributes attr, ThisDecl @this, [CanBeNull] ParamDecl[] @params, MType retType)
 			: base(sym)
 		{
 			this.attr = attr;
@@ -232,7 +233,7 @@ namespace Metaphor
 		[NonSerialized]
 		public ConstructorBuilder ctorBuilder;
 
-		public MConstructorBuilder(int sym, MethodAttributes attr, ThisDecl @this, ParamDecl[] @params)
+		public MConstructorBuilder(int sym, MethodAttributes attr, ThisDecl @this, [CanBeNull] ParamDecl[] @params)
 			: base(sym, attr, @this, @params, PrimType.Void)
 		{
 		}

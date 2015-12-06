@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -271,7 +272,8 @@ namespace Metaphor.Compiler
 			set { token = value; }
 		}
 
-		public static IToken FirstToken<T>(List<T> nodes) where T : Node
+	    [CanBeNull]
+	    public static IToken FirstToken<T>(List<T> nodes) where T : Node
 		{
 			if (nodes == null || nodes.Count == 0) return null;
 			else return nodes[0].Token;

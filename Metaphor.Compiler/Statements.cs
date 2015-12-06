@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -317,8 +318,8 @@ namespace Metaphor.Compiler
 
 	public class For : Stmt
 	{
-		public LocalDecl initVar;
-		public List<Expr> initExprs;
+	    [CanBeNull] public LocalDecl initVar;
+	    [CanBeNull] public List<Expr> initExprs;
 		public Expr cond;
 		public List<Expr> loop;
 		public Stmt body;
@@ -485,7 +486,7 @@ namespace Metaphor.Compiler
 
 	public class Return : Stmt
 	{
-		public Expr expr;
+	    [CanBeNull] public Expr expr;
 
 		public Return(IToken token, Expr expr)
 			: base(token)

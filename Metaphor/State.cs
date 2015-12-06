@@ -22,7 +22,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using JetBrains.Annotations;
 using Metaphor.Collections;
 
 namespace Metaphor
@@ -425,9 +425,9 @@ namespace Metaphor
 
 		protected readonly List<Function> functions;
 
-		protected readonly TypeCheckState outer;
+	    [CanBeNull] protected readonly TypeCheckState outer;
 
-		public TypeCheckState(Set<object> rootCspStore, TypeCheckState outer)
+		public TypeCheckState(Set<object> rootCspStore, [CanBeNull] TypeCheckState outer)
 		{
 			this.rootCspStore = rootCspStore;
 			this.outer = outer;
@@ -1185,7 +1185,7 @@ namespace Metaphor
 		private readonly Module module;
 
 		public Set<object> cspObjects;
-		private VirtualTuple cspStoreType;
+	    [CanBeNull] private VirtualTuple cspStoreType;
 		private Dictionary<object, int> cspFields;
 
 		public DynamicMethodGenState(Module module)
@@ -1194,7 +1194,8 @@ namespace Metaphor
 			this.cspObjects = new Set<object>();
 		}
 
-		public object MakeCspStore()
+	    [CanBeNull]
+	    public object MakeCspStore()
 		{
 			if (cspObjects.Count > 0)
 			{
@@ -1884,7 +1885,7 @@ namespace Metaphor
 	internal class FunctionLoc : Location
 	{
 		private readonly ConstructorInfo delegateCtor;
-		private readonly ConstructorInfo closureCtor;
+	    [CanBeNull] private readonly ConstructorInfo closureCtor;
 		private readonly MethodInfo invokeMethod;
 		private readonly List<Location> closures;
 

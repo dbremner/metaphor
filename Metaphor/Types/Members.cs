@@ -17,6 +17,7 @@ using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Metaphor
 {
@@ -139,7 +140,8 @@ namespace Metaphor
 			return MType.Empty;
 		}
 
-		public static MMethodInfo ChooseBestOverload(MMethodInfo[] methods, ParamType[] paramTypes, MType retType)
+	    [CanBeNull]
+	    public static MMethodInfo ChooseBestOverload(MMethodInfo[] methods, ParamType[] paramTypes, MType retType)
 		{
 			int i = MMethodBase.ChooseBestOverload(methods, paramTypes, retType);
 			return i != -1 ? methods[i] : null;

@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Resources;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 
 namespace Metaphor
@@ -1063,7 +1064,7 @@ namespace Metaphor
 			}
 		}
 
-		internal void SetLocation(ConstructorInfo closureCtor, MethodInfo invokeMethod, Location cspStore, List<Closure> closures)
+		internal void SetLocation(ConstructorInfo closureCtor, MethodInfo invokeMethod, [CanBeNull] Location cspStore, List<Closure> closures)
 		{
 			List<Location> locs = null;
             if (cspStore != null)

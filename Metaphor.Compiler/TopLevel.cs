@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 using M = Metaphor;
 using IToken = antlr.IToken;
@@ -55,7 +56,7 @@ namespace Metaphor.Compiler
 
 	public class Namespace : Node
 	{
-        public string name;
+	    [CanBeNull] public string name;
         public List<Namespace> namespaces;
         public List<TypeDecl> typeDecls;
 

@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using JetBrains.Annotations;
 using Metaphor.Collections;
 
 using M = Metaphor;
@@ -235,7 +236,8 @@ namespace Metaphor.Compiler
 			return null;
 		}
 
-		public System.Type LookupSystemType(string ns, string name, int arity)
+	    [CanBeNull]
+	    public System.Type LookupSystemType(string ns, string name, int arity)
 		{
 			string fullName = string.Format("{0}{1}{2}",
 				ns != null ? $"{ns}." : string.Empty,
@@ -360,7 +362,8 @@ namespace Metaphor.Compiler
 			expectedType.Push(type);
 		}
 
-		public MType GetExpectedType()
+	    [CanBeNull]
+	    public MType GetExpectedType()
 		{
 			if (expectedType.Count > 0) return SubstType(expectedType.Peek());
 			else return null;
